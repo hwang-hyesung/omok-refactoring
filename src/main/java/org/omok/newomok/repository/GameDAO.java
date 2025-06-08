@@ -3,14 +3,10 @@ package org.omok.newomok.repository;
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j2;
 import org.omok.newomok.domain.GameVO;
-import org.omok.newomok.domain.UserVO;
 import org.omok.newomok.util.ConnectionUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
-
 @Log4j2
 public enum GameDAO {
     INSTANCE;

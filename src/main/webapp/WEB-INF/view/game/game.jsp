@@ -2,8 +2,9 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import ="org.omok.newomok.domain.UserVO"%>
 <%@ page import ="org.omok.newomok.domain.GameVO" %>
-<%@ page import ="org.omok.newomok.repository.userDAO"%>
-<%@ page import ="org.omok.newomok.repository.gameDAO"%>
+<%@ page import ="org.omok.newomok.repository.UserDAO"%>
+<%@ page import ="org.omok.newomok.repository.GameDAO"%>
+<%@ page import="org.omok.newomok.repository.MatchDAO" %>
 <%
     // 로그인 유저 확인
     UserVO loginUser = (UserVO) session.getAttribute("loginInfo");
@@ -24,7 +25,7 @@
     if (gameIdParam != null) {
         try {
             gameId = Integer.parseInt(gameIdParam);
-            GameVO game = gameDAO.INSTANCE.getGameById(gameId);
+            GameVO game = MatchDAO.getGameById(gameId);
 
             if (game != null) {
                 player1Id = game.getPlayer1();
@@ -32,7 +33,7 @@
                 gameStatus = game.getStatus();
 
                 // player1 정보
-                UserVO player1 = userDAO.INSTANCE.findUserById(player1Id);
+                UserVO player1 = UserDAO.INSTANCE.getUserById(player1Id);
                 if (player1 != null) {
                     player1Img = player1.getImage();
                     player1Win = player1.getWin();
@@ -40,7 +41,7 @@
                 }
 
                 // player2 정보
-                UserVO player2 = userDAO.INSTANCE.findUserById(player2Id);
+                UserVO player2 = UserDAO.INSTANCE.getUserById(player2Id);
                 if (player2 != null) {
                     player2Img = player2.getImage();
                     player2Win = player2.getWin();

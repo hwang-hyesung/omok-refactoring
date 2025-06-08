@@ -34,7 +34,7 @@ public enum MatchDAO {
     }
 
     // 게임 방을 만들고 다시 객체를 return 하도록 한다.
-    public GameVO makeGame(GameVO gameVO) {
+    public static GameVO makeGame(GameVO gameVO) {
         String sql = "INSERT INTO GAME (status, player1) VALUES (?, ?)";
 
         try {
@@ -61,7 +61,7 @@ public enum MatchDAO {
         return null;
     }
 
-    public GameVO getGameById(int gameId) {
+    public static GameVO getGameById(int gameId) {
         String sql = "SELECT * FROM GAME WHERE game_id = ?";
         GameVO gameVO = null;
 
