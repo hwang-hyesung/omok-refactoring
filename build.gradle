@@ -22,12 +22,46 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-    compileOnly('jakarta.mvc:jakarta.mvc-api:2.1.0')
-    compileOnly('jakarta.servlet:jakarta.servlet-api:6.1.0')
-    compileOnly('jakarta.websocket:jakarta.websocket-api:2.2.0')
+    compileOnly('javax.servlet:javax.servlet-api:4.0.1')
+    compileOnly('javax.websocket:javax.websocket-api:1.1')
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+
+    //Maria db 사용 하기 위해 추가
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.3.3'
+
+    //ConnectionPool HikariCP 사용하기 위해 추가
+    implementation 'com.zaxxer:HikariCP:6.3.0'
+
+    //log4j2 사용하기 위해 추가...여기는 로그 용이라 저만 쓰는 거긴 한데 같이 올립니다!
+    //log4j-core
+    implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
+    //log4j-api
+    implementation 'org.apache.logging.log4j:log4j-api:2.23.1'
+    //log4j-slf4j-impl
+    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.23.1'
+
+    //lombok 사용하기 위해 추가
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    //jsp에서 jstl 사용하기 위해 추가
+    implementation 'javax.servlet:jstl:1.2'
+
+    //websocket endpoint 의존성
+    //우리 프로젝트가 java 8e인가..그래서 jakarta 말고 javax를 사용
+    providedCompile 'javax.websocket:javax.websocket-api:1.1'
+
+    //use test environment
+    testCompileOnly("org.projectlombok:lombok:1.18.38")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.38")
+
+    //jstl
+    implementation 'javax.servlet:jstl:1.2'
+
+    //json 파싱을 위한 의존성 추가
+    implementation 'com.google.code.gson:gson:2.10.1'
 }
 
 test {
