@@ -1,0 +1,116 @@
+/* 모달 배경 전체 */
+#modal {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.6);
+    height: 100vh;
+    width: 100vw;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* 모달 안쪽 판 (보드) */
+#board {
+    width: 50vw;
+    aspect-ratio: 4 / 3;
+    background: url('/img/modal_background.png') no-repeat center center;
+    background-size: contain;
+    min-width: 100px;
+}
+
+/* 승리/패배 텍스트 영역 */
+#text {
+    background: no-repeat center center;
+    background-size: contain;
+    height: 25%;
+    margin-top: 9%;
+    margin-bottom: 4%;
+}
+
+/* 유저 정보 영역 */
+#info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5%;
+    padding: 0 17%;
+    overflow: hidden;
+}
+
+/* 유저 이미지 */
+#user_img {
+    flex-basis: 35%;
+    aspect-ratio: 1 / 1;
+    background: no-repeat center center;
+    background-size: contain;
+    min-width: 80px;
+}
+
+/* 설명 텍스트 */
+#explanation {
+    flex: 1;
+    font-size: clamp(12px, 2vw, 28px);
+    word-break: keep-all;
+    min-width: 120px;
+    align-self: flex-start;
+    padding: 4% 0;
+}
+
+/* 승패 바 */
+#bar {
+    display: flex;
+    height: 23px;
+    background-color: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+    border: 3px solid #333;
+}
+
+#win_bar, #lose_bar {
+    height: 23px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(8px, 1.5vw, 13px);
+}
+
+#win_bar {
+    background-color: #4a68c3;
+}
+
+#lose_bar {
+    background-color: #f44336;
+}
+
+/* 승/패 비율 라벨 */
+#bar_label {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4%;
+    font-size: clamp(10px, 1.5vw, 15px);
+    padding: 0 5px;
+}
+
+/* 버튼 영역 */
+#btn {
+    height: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0 2%;
+    gap: 4%;
+}
+
+#btn button {
+    height: 45%;
+    width: 25%;
+    background-color: #d9d9d9;
+    border-radius: 10px;
+    border: 1px solid #d9d9d9;
+    font-size: clamp(8px, 1.5vw, 25px);
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
