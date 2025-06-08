@@ -9,44 +9,62 @@ window.addEventListener('pageshow', (event) => {
     }
 });
 
-$(window).ready(function(){
+document.addEventListener("DOMContentLoaded", function() {
     let normalImgUrl = "/img/profile/" + imageNum + ".png";
     let sadImgUrl = "/img/profile/" + imageNum + "_sad.png";
 
     /* 한줄 소개 변경 클릭 리스너*/
-    $('#edit_icon').on('click', function() {
-        updateBio(this); // 클릭한 DOM 요소를 인자로 전달
+    document.getElementById('edit_icon').addEventListener('click', function() {
+        updateBio(this);
     });
 
     /* 한줄 소개 박스 포커스 리스너*/
-    $('textarea.bio_text').on({
-        focus: function () {
+    document.querySelectorAll('textarea.bio_text').forEach(function(textarea) {
+        textarea.addEventListener('focus', function () {
             setBioBorder(editing);
-        },
-        blur: function() {
+        });
+
+        textarea.addEventListener('blur', function () {
             setBioBorder(!editing);
-        },
-        mousedown: function(e) {
-            if($(this).prop('readonly')) {
+        });
+
+        textarea.addEventListener('mousedown', function (e) {
+            if (textarea.readOnly) {
                 e.preventDefault();
             }
-        }
+        });
     });
 
     /* 로그아웃 버튼 호버 리스너*/
-    $('#logout_btn img').hover(
-        function() {
-            $('#avatar')
-                .css('background-image', 'url(' + sadImgUrl + ')');
-        },
-        function() {
-            $('#avatar')
-                .css('background-image', 'url(' + normalImgUrl + ')');
-        }
-    );
+    const logoutImg = document.querySelector('#logout_btn img');
+    const avatar = document.getElementById('avatar');
 
-    /* 시작 버튼 리스너 */
-    document.getElementById("start_btn").addEventListener('click', startGame);
+    if (logoutImg && avatar) {
+        logoutImg.addEventListener('mouseenter', function () {
+            avatar.style.backgroundImage = `url(${sadImgUrl})`;
+        });
+
+        logoutImg.addEventListener('mouseleave', function () {
+            avatar.style.backgroundImage = `url(${normalImgUrl})`;
+        });
+    }
+
+    /* 시작버튼 리스너 */
+    document.getElementById("start_btn").addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const startBtn = this;
+        startBtn.disabled = true;
+
+        const clickSound = document.getElementById("click-sound");
+        clickSound.currentTime = 0;
+        clickSound.play();
+
+        clickSound.onended = () => {
+            startGame();
+            startBtn.disabled = false;
+        };
+    });
 
     /* 랭킹(1-10위) 업데이트 */
     setRankingList(ranks);
@@ -60,6 +78,7 @@ $(window).ready(function(){
     /* 그래프 업데이트 */
     setBar(winRate);
 });
+
 
 /* 한줄 소개 변경 함수 */
 function updateBio(buttonEl) {

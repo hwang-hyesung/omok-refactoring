@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Sign Up</title>
-    <link rel="stylesheet" href="./signup.css">
+    <link rel="stylesheet" href="../../../css/signup/signup.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/music/css/bgm-button-style.css">
 
     <%--  회원가입 에러 모달 사용을 위해서 로그인 에러 모달 재활용...--%>
-    <link rel="stylesheet" href="../login/login-error-modal.css">
+    <link rel="stylesheet" href="../../../css/login/login-error-modal.css">
 
-    <script src="./signup.js"></script>
+    <script src="../../../js/signup/signup.js"></script>
     <script src="${pageContext.request.contextPath}/music/js/bgm-control.js"></script>
     <script src="${pageContext.request.contextPath}/music/js/sound-effect-control.js"></script>
 </head>

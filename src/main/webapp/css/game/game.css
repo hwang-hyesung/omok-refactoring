@@ -1,0 +1,146 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+body {
+    background-image: url("../../img/background2.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: top center;
+    padding: 10px;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4vw;
+    width: 90%;
+    max-width: 1500px;
+    height: 90%;
+    margin: auto;
+    padding: 10px;
+    box-sizing: border-box;
+    /*display: grid;*/
+    /*grid-template-columns: 1fr 0.8fr;*/
+    /*gap: 60px;*/
+    /*height: 90%;*/
+    /*width: 100%;*/
+    /*padding: 10px;*/
+    /*box-sizing: border-box;*/
+    /*align-items: center;*/
+}
+
+.board {
+    position: relative;
+    flex: 1.1;
+    width: min(60vmin, 300px);
+    height: auto;
+    max-width: 600px;
+    aspect-ratio: 1 / 1;
+}
+
+.board img {
+    padding: 7px 0 0 8px;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.stone {
+    position: absolute;
+    width: calc(80% / 14);
+    height: calc(80% / 14);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.black {
+    background-image: url("../../img/black-stone.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+.white {
+    background-image: url("../../img/white-stone.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+
+}
+
+.stone.hover {
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.info {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    max-width: 400px;
+    min-width: 260px;
+    box-sizing: border-box;
+    gap: 1vw;
+}
+
+@media (max-width: 600px) {
+    .info {
+        gap: 0.5vw;
+    }
+}
+
+.profile {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.chat {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border-radius: 10px;
+    padding: 10px;
+    max-width: 100%;
+    width: 100%;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 900px) {
+    .chat {
+        padding: 8px;
+    }
+}
+
+.exit-button {
+    align-self: center;
+    background-color: #E5A552;
+    padding: 1rem 2rem;
+    border: 3px solid #9C5416;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    min-width: 120px;
+    cursor: pointer;
+}
+
+@media (max-width: 900px) {
+    .exit-button {
+        font-size: 1.0rem;
+        padding: 0.8rem 1.8rem;
+    }
+}

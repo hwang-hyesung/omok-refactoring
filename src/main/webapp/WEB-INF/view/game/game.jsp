@@ -68,12 +68,13 @@
 <head>
     <meta charset="UTF-8">
     <title>OMOK</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/view/game/game.css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/view/game/profile/profile.css" />
+    <link rel="stylesheet" href="../../../css/game/game.css" />
+    <link rel="stylesheet" href="../../../css/game/profile.css" />
+    <link rel="stylesheet" href="../../../css/game/chat.css"/>
     <%--    <link rel="stylesheet" href="${pageContext.request.contextPath}/view/game/board/board.css"/>--%>
     <%--매칭 모달 스타일 추가--%>
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/view/modal/match/matchmodal.css"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/view/game/chat/chatwindow/chatstyle.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/matching/matching.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/result/result.css"/>
 </head>
 <body>
 
@@ -163,7 +164,7 @@
     </div>
 </div>
 
-<script type="module" src="./board.js"></script>
+<script type="module" src="../../../js/game/board.js"></script>
 
 <%--&lt;%&ndash;여기에 웹소켓 + 매칭 관련 스크립트 추가&ndash;%&gt;--%>
 <%--<script type="module" src="${pageContext.request.contextPath}/view/sunJ_maching/js/match/modal-ui.js"></script>--%>

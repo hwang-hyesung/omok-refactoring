@@ -80,7 +80,7 @@ start btn 움직임
 }
 
 body {
-    background-image: url("../../../img/background2.png");
+    background-image: url("../../img/background2.png");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: top center;
@@ -470,7 +470,7 @@ textarea.bio_text {
     width: 80%;
     aspect-ratio: 1 / 1;
     border-radius: 2vw;
-    background-image: url("../../../img/profile/2.png");
+    background-image: url("../../img/profile/2.png");
     background-color: skyblue;
     background-size: cover;
     background-position: center;
@@ -513,7 +513,7 @@ textarea.bio_text {
     aspect-ratio: 1.9 / 1;
     border: none;
     background-color: transparent;
-    background-image: url("../../../img/start_btn.png");
+    background-image: url("../../img/start_btn.png");
     background-repeat: no-repeat;
     background-size: contain;
     animation: jittery 4s infinite;

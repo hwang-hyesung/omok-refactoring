@@ -20,7 +20,7 @@ html, body {
 body {
     position: relative;
     overflow: hidden;
-    background-image: url("../../../img/background1.png");
+    background-image: url("../../img/background1.png");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
