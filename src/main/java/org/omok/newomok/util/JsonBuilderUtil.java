@@ -1,5 +1,6 @@
 package org.omok.newomok.util;
 
+
 import com.google.gson.JsonObject;
 import org.omok.newomok.domain.GameVO;
 import org.omok.newomok.domain.UserVO;
