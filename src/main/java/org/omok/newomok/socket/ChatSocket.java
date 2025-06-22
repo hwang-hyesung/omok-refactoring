@@ -10,16 +10,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @ServerEndpoint("/chat/{gameId}")
 public class ChatSocket {
 
-    // 게임 ID 별로 세션을 관리하
+    // 게임 ID 별로 세션을 관리하기 위함
     private static Map<String, Set<Session>> chatRooms = new ConcurrentHashMap<>();
 
     @OnOpen
     public void onOpen(Session session, @PathParam("gameId") String gameId) throws IOException {
         // gameId 방이 없으면 새로 만들고, 세션 추가
-        chatRooms.putIfAbsent(gameId, Collections.synchronizedSet(new HashSet<>()));
-        chatRooms.get(gameId).add(session);
-
-        // 세션에 gameId 저장 (나중에 메시지 처리 시 활용)
+        chatRooms.computeIfAbsent(gameId, k -> Collections.synchronizedSet(new HashSet<>())).add(session);
         session.getUserProperties().put("gameId", gameId);
 
         // 접속자에게 초기 메시지 전달
@@ -27,6 +24,7 @@ public class ChatSocket {
         session.getBasicRemote().sendText(init);
 
         System.out.println("새 연결: 세션ID=" + session.getId() + ", 게임방=" + gameId);
+        System.out.println("채팅소켓 열림");
     }
 
     @OnMessage
@@ -73,7 +71,7 @@ public class ChatSocket {
             if (room != null) {
                 room.remove(session);
                 if (room.isEmpty()) {
-                    // 방이 비면 맵에서 제거 (메모리 누수 방지)
+                    // 방이 비면 맵에서 제거
                     chatRooms.remove(gameId);
                     System.out.println("게임방 " + gameId + "이 비어서 제거됨");
                 }
