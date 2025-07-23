@@ -214,15 +214,15 @@ function startGame() {
     })
         .then(res => {
             if (res.redirected) {
+                //로그인이 되어있지 않은 경우 리다이렉트
                 window.location.href = res.url;
                 return;
             }
             return res.json();
         })
         .then(data => {
-            if (!data) return; // 위에서 리다이렉트 되었으면 중단됨
-            //로그 찍기 용
-            console.log("서버 응답:", data); // 🔍 응답 구조 확인용
+            if (!data) return;
+            //you, game 정보 반환
             const gameId = data.game.gameId;
             //로케이션 경로 변경
             location.href = `/omok/play?gameId=${gameId}`;

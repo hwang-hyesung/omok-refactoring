@@ -41,6 +41,6 @@ public class MainController extends HttpServlet {
         int myRank = mainService.getMyRank(userVO.getUserId());
         request.setAttribute("myRank", myRank);
 
-        request.getRequestDispatcher("/WEB-INF/view/home/home.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/view/main/main.jsp").forward(request, response);
     }
 }
