@@ -11,7 +11,7 @@
 }
 
 /* 모달 안쪽 판 (보드) */
-#board {
+#container {
     width: 50vw;
     aspect-ratio: 4 / 3;
     background: url('/img/modal_background.png') no-repeat center center;

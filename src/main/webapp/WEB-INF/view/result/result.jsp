@@ -1,5 +1,5 @@
 <div id="modal">
-    <div id="board">
+    <div id="container">
         <div id="text"></div>
         <div id="info">
             <div id="user_img"></div>

@@ -37,7 +37,7 @@
 <div id="full_box">
     <div id="section1">
         <!-- 랭킹 -->
-        <img src="../../../img/rank_background.png" id="rank_background" alt="랭킹박스">
+        <img src="${pageContext.request.contextPath}/img/rank_background.png" id="rank_background" alt="랭킹박스">
         <div id="ranking">
             <div id="ranking_section">
             </div>
@@ -49,7 +49,7 @@
         <div id="logo_section">
             <div class="logo_wrapper">
                 <!-- 로고 -->
-                <img src="../../img/logo.png" id="logo" alt="로고">
+                <img src="${pageContext.request.contextPath}/img/logo.png" id="logo" alt="로고">
             </div>
         </div>
         <div id="profile_section">
@@ -64,7 +64,7 @@
                         <span class="label">한줄소개</span>
                         <span class="value bio">
                                 <textarea class="bio_text" maxlength="20" readonly></textarea>
-                                <img src="../../img/pencil_icon.png" id="edit_icon" alt="수정 아이콘">
+                                <img src="${pageContext.request.contextPath}/img/pencil_icon.png" id="edit_icon" alt="수정 아이콘">
                             </span>
                     </div>
                     <div class="info_row">
