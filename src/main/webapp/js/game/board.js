@@ -1,4 +1,6 @@
 //오목 돌 배치
+import {myRole} from "./game.js";
+
 export const boardSize = 15;
 export const board = Array.from({ length: boardSize }, () => Array(boardSize).fill(0));
 export let currentTurn = 1;
@@ -129,7 +131,6 @@ export function createHoverStone() {
 
 function placeStone(row, col) {
     if (board[row][col] !== 0) return;
-    let myRole;
     if (myRole !== currentTurn || myRole === 0) {
         return;
     }

@@ -8,8 +8,8 @@ FINISHED: 완료 상태
 ABORTED: 중단 상태 (EX. 도중에 창 끄기 등등)
  */
 
-import { cache } from "../matching/matching";
-import * as matchingJs from "../matching/matching";
+import { cache } from "../matching/matching.js";
+import * as matchingJs from "../matching/matching.js";
 
 let status = ['WAITING' , 'MATCHED', 'PLAYING', 'FINISHED', 'ABORTED'];
 
