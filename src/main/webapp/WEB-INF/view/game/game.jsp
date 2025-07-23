@@ -117,7 +117,6 @@
         </div>
     </div>
 </div>
-<%--매칭 모달 추가 끝--%>
 
 <div class="container">
     <div class="board" id="board">
@@ -151,7 +150,6 @@
 
 
         <!-- 채팅 -->
-        <%--        <div class="chat">--%>
         <div class="chat-box">
             <div class="chat-top">채팅방</div>
             <div class="chat-mid"></div>
@@ -160,7 +158,6 @@
                 <button class="send-btn">전송</button>
             </div>
         </div>
-        <%--        </div>--%>
     </div>
 </div>
 
