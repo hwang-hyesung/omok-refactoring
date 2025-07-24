@@ -209,8 +209,7 @@ function startGame() {
     // 로그인 안 되어 있을 경우 이동해야 해서 이렇게 잡아둠.
     fetch("/omok/match", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({})
+        headers: { "Content-Type": "application/json" }
     })
         .then(res => {
             if (res.redirected) {
@@ -222,7 +221,7 @@ function startGame() {
         })
         .then(data => {
             if (!data) return;
-            //you, game 정보 반환
+            //game 정보 반환
             const gameId = data.game.gameId;
             //로케이션 경로 변경
             location.href = `/omok/play?gameId=${gameId}`;

@@ -8,7 +8,6 @@ FINISHED: 완료 상태
 ABORTED: 중단 상태 (EX. 도중에 창 끄기 등등)
  */
 
-import { cache } from "../matching/matching.js";
 import * as matchingJs from "../matching/matching.js";
 
 let status = ['WAITING' , 'MATCHED', 'PLAYING', 'FINISHED', 'ABORTED'];
@@ -21,7 +20,7 @@ export let myRole = 0; // 0 = 미할당, 1 = 흑돌, 2 = 백돌
 
 /* 게임 시작 시 웹소켓 오픈 */
 function openWebSocket(gameId) {
-    const socket = new WebSocket(`ws://localhost:8080/min-value?gameId=${gameId}`);
+    const socket = new WebSocket(`ws://localhost:8080/game/${gameId}`);
 
     socket.onopen = () => console.log('websocket: 정상 연결');
     socket.onerror = () => console.log('websocket: 오류');
@@ -56,15 +55,4 @@ function openWebSocket(gameId) {
             //aborted
         }
     };
-}
-
-function handleWaitingStatus(data) {
-    //1. 내 정보 넣기
-    matchingJs.renderPlayer(1, cache.you);
-
-    //2. 돌 색상 정하기 (player1: 흑돌 / player2: 백돌)
-    matchingJs.renderPlayer(0, cache.opp);
-
-    //3. 매칭 모달 띄우기
-    matchingJs.openMatchingModal();
 }

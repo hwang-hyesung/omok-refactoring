@@ -50,8 +50,7 @@
     z-index: 1;
 }
 
-.profile-image1,
-.game-profile-image2 {
+.profile-image {
     width: 100%;
     aspect-ratio: 1 / 1;
     background-size: cover;
@@ -59,13 +58,6 @@
     border-top-right-radius: 10px;
 }
 
-.profile-image1 {
-    background-image: url('../../../img/profile/1.png');
-}
-
-.game-profile-image2 {
-    background-image: url('../../../img/profile/4.png');
-}
 
 .profile-player-name {
     width: 100%;
