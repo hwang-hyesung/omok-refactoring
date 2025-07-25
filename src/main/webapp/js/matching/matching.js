@@ -209,10 +209,8 @@ function showPlayer2Component() {
 }
 
 function openMatchingModal() {
-    console.log("에");
     console.log(sessionStorage.getItem("opened"));
     if(sessionStorage.getItem("opened") === "Y") {
-        console.log("엥");
         return;
     }
 
@@ -230,8 +228,7 @@ function showGameProfile(player, role) {
     const imgElements = document.getElementsByClassName('profile-image');
 
     if(player === null) {
-        nameElements[role - 1].textContent = "...";
-        imgElements[role - 1].style.backgroundImage = `url('${contextPath}/img/profile/unknown.png')`;
+        nameElements[role - 1].textContent = "Load..";
     } else {
         nameElements[role - 1].textContent = player.id;
         imgElements[role - 1].style.backgroundImage = `url('${contextPath}/img/profile/${player.img}.png')`;
