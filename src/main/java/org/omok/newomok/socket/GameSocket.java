@@ -69,10 +69,6 @@ public class GameSocket {
                 roomBoards.put(gameIdStr, new int[BOARD_SIZE][BOARD_SIZE]);
             }
 
-        } else if ("GAMEOVER".equals(type)) {
-            // 클라이언트가 보내는 게임오버 메시지 처리 필요 없도록 변경
-            String roomId = sessionRoomMap.get(session);
-            broadcast(roomId, message);
         }
     }
 
@@ -154,13 +150,9 @@ public class GameSocket {
     }
 
     @OnClose
-    public void onClose(Session session) {
-        String roomId = sessionRoomMap.get(session);
-        if (roomId != null) {
-            leaveRoom(session, roomId);
-        }
+    public void onClose(@PathParam("gameId") int gameId, Session session) {
+        String gameIdStr = String.valueOf(gameId);
+        leaveRoom(session, gameIdStr);
         System.out.println("서버 연결 종료 " + session.getId());
-
-        //todo: 매칭 소켓에 종료 알림
     }
 }
