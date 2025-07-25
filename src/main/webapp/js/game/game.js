@@ -41,6 +41,8 @@ function startGame(gameId) {
         } else if(status === status[2]) {
             //STONE
             console.log(status[2]);
+
+            drawStone(data);
         } else if(status === status[3]) {
             //GAMEOVER
             console.log(status[3]);
