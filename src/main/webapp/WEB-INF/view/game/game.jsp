@@ -129,8 +129,8 @@
                 <div class="card-bg"></div>
                 <div class="profile-player-card">
                     <!-- profile-image1: 배경 이미지로 처리 -->
-                    <div class="profile-image1" style="background-image: url('<%= request.getContextPath() %>/img/profile/<%= player1Img %>.png');"></div>
-                    <div class="profile-player-name"><%= player1Id %></div>
+                    <div class="profile-image"></div>
+                    <div class="profile-player-name"></div>
                 </div>
                 <img src="<%= request.getContextPath() %>/img/black_stone.png" class="stone-image-black" alt="흑돌"/>
             </div>
@@ -142,8 +142,8 @@
                 <img src="<%= request.getContextPath() %>/img/white_stone.png" class="stone-image-white" alt="백돌"/>
                 <div class="profile-player-card">
                     <!-- profile-image2: 배경 이미지로 처리 -->
-                    <div class="game-profile-image2" style="background-image: url('<%= request.getContextPath() %>/img/profile/<%= player2Img %>.png');"></div>
-                    <div class="profile-player-name"><%= player2Id %></div>
+                    <div class="profile-image"></div>
+                    <div class="profile-player-name"></div>
                 </div>
             </div>
         </div>

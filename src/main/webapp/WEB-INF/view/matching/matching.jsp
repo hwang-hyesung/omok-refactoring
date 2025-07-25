@@ -1,5 +1,12 @@
-
-
+<script>
+    const user = {
+        userId: '${sessionScope.loginInfo.userId}',
+        total: ${sessionScope.loginInfo.totalGames},
+        win: ${sessionScope.loginInfo.winCount},
+        lose: ${sessionScope.loginInfo.loseCount}
+    };
+    console.log(user);
+</script>
 <div id="modalOverlay" class="modal-overlay" style="display:none;">
     <!-- 모달 박스 -->
     <div class="modal-content">
@@ -37,3 +44,4 @@
         </div>
     </div>
 </div>
+<script type="module" src="${pageContext.request.contextPath}/js/matching/matching.js"></script>

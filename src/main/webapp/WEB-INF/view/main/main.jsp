@@ -19,10 +19,21 @@
     <link rel="stylesheet" href="../../../css/main/main.css" type="text/css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/music/css/bgm-button-style.css" type="text/css"/>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="../../../js/main/main.js" type="text/javascript"></script>
+    <script type="module" src="../../../js/main/main.js" type="text/javascript"></script>
     <script src="${pageContext.request.contextPath}/music/js/bgm-control.js"></script>
     <script src="${pageContext.request.contextPath}/music/js/sound-effect-control.js"></script>
 </head>
+<script>
+    const user = {
+        id: '${sessionScope.loginInfo.userId}',
+        img: '${sessionScope.loginInfo.image}',
+        win: '${sessionScope.loginInfo.win}',
+        lose: '${sessionScope.loginInfo.lose}',
+        rate: '${sessionScope.loginInfo.rate}'
+    };
+
+    localStorage.setItem("loginInfo", JSON.stringify(user));
+</script>
 <body>
 <button id="music-btn" class="music-off"></button>
 <audio id="bgm" src="${pageContext.request.contextPath}/music/bgm.mp3" loop></audio>

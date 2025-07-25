@@ -1,5 +1,6 @@
 package org.omok.newomok.socket;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.extern.log4j.Log4j2;
@@ -19,7 +20,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Log4j2
-@ServerEndpoint(value = "/min-value/{gameId}")
+@ServerEndpoint(value = "/matching")
 public class MatchingSocket {
     // gameId → 세션들
     // Set<Session> -> 해당 게임방에 들어온 유저들
@@ -31,76 +32,56 @@ public class MatchingSocket {
     private static final GameDAO gameDAO = GameDAO.INSTANCE;
     private static final UserDAO userDAO = UserDAO.INSTANCE;
 
-    private Session session;
-    private int gameId;
-
     @OnOpen
-    public void onOpen(Session session, @PathParam("gameId") int gameId) throws IOException {
-        this.session = session;
-        this.gameId = gameId;
-        // 방에 세션 추가
+    public void onOpen(Session session) throws IOException {
+        //1. 엔드포인트에서 gameId 파싱
+        int gameId = Integer.parseInt(session.getRequestParameterMap().get("gameId").get(0));
+
+        //2. 방에 세션 추가
         gameRoomMap.computeIfAbsent(gameId, k -> ConcurrentHashMap.newKeySet()).add(session);
         sessionRoomMap.put(session, gameId);
 
-        // 대기 상태 메시지 전송
-        JsonObject response = new JsonObject();
-        response.addProperty("status", "WAITING");
-        response.addProperty("gameId", gameId);
-        session.getBasicRemote().sendText(response.toString());
-        System.out.println("매칭소켓 열림");
-    }
+        // 접속 인원 수 확인
+        if(gameRoomMap.get(gameId).size() == 1) {
+            System.out.println("matching socket - WAITING");
 
-    @OnMessage
-    public void onMessage(String message, Session session) throws IOException {
-        JsonObject receivedJson = JsonParser.parseString(message).getAsJsonObject();
-        String type = receivedJson.get("type").getAsString();
+            // 1명: 대기 상태 메시지 전송
+            JsonObject response = new JsonObject();
+            response.addProperty("status", "WAITING");
+            response.addProperty("gameId", gameId);
 
-        if ("JOIN".equals(type)) {
-            String userId = receivedJson.get("userId").getAsString();
-            int gameId = receivedJson.get("gameId").getAsInt();
+            session.getBasicRemote().sendText(response.toString());
 
+        } else {
+            System.out.println("matching socket - MATCHED");
+
+            // 2명: 매칭 상태 메시지 전송
+            JsonObject response = new JsonObject();
+            response.addProperty("status", "MATCHED");
+            response.addProperty("gameId", gameId);
+
+            // 해당 gameId로 게임 정보 가져오기
             GameVO game = MatchDAO.getGameById(gameId);
-            if (game != null && game.getStatus() == GameVO.GameStatus.WAITING) {
-                game.setPlayer2(userId);
-                game.setStatus(GameVO.GameStatus.PLAYING);
-                matchDAO.updateGame(game);
+            UserVO player1 = userDAO.getUserById(game.getPlayer1());
+            UserVO player2 = userDAO.getUserById(game.getPlayer2());
 
-                session.getUserProperties().put("userId", userId);
+            Gson gson = new Gson();
+            response.addProperty("player1", gson.toJsonTree(player1).toString());
+            response.addProperty("player2", gson.toJsonTree(player2).toString());
 
-                // 두 세션 모두에게 MATCHED 메시지 전송
-                Set<Session> sessions = gameRoomMap.get(gameId);
-                if (sessions != null) {
-                    sendMatchedMessageToBoth(gameId, sessions);
-                }
+            Set<Session> sessions = gameRoomMap.get(gameId);
+
+            for (Session s : sessions) {
+                s.getBasicRemote().sendText(response.toString());
             }
         }
     }
 
-    // 소켓 실시간 양방향 매칭
-    private void sendMatchedMessageToBoth(int gameId, Set<Session> sessions) throws IOException {
-        GameVO game = MatchDAO.getGameById(gameId);
-        UserVO player1 = userDAO.getUserById(game.getPlayer1());
-        UserVO player2 = userDAO.getUserById(game.getPlayer2());
-
-        for (Session s : sessions) {
-            if (!s.isOpen()) continue;
-
-            String userId = (String) s.getUserProperties().get("userId"); //Session에서 userid 가져오기
-
-            UserVO you = userId.equals(player1.getUserId()) ? player1 : player2;
-            UserVO opponent = userId.equals(player1.getUserId()) ? player2 : player1;
-            int yourRole = you == player1 ? 2 : 1;
-
-            JsonObject response = new JsonObject();
-            response.addProperty("status", "MATCHED");
-            response.add("you", JsonBuilderUtil.getUserInfo(you));
-            response.add("opponent", JsonBuilderUtil.getUserInfo(opponent));
-            response.addProperty("role", yourRole);
-            response.add("game", JsonBuilderUtil.getGameInfo(game));
-
-            s.getBasicRemote().sendText(response.toString());
-        }
+    @OnMessage
+    public void onMessage(String message, Session session) throws IOException {
+        //게임이 끝나면 소켓 닫기 (게임 소켓, 챗 소켓)
     }
+
 
     @OnClose
     public void onClose(Session session) {

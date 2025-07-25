@@ -1,5 +1,5 @@
 //오목 돌 배치
-import {myRole} from "./game.js";
+import {myRole} from "../matching/matching.js";
 
 export const boardSize = 15;
 export const board = Array.from({ length: boardSize }, () => Array(boardSize).fill(0));

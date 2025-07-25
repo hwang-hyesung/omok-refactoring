@@ -1,70 +1,49 @@
-/* 매칭 창 띄우기 */
+import { sockets, myRole, currentTurn} from "../matching/matching.js";
 
 /* 게임 상태 변수
-WAITING: 대기 상태
-MATCHED: 매치된 상태
-PLAYING: 게임 중
-FINISHED: 완료 상태
-ABORTED: 중단 상태 (EX. 도중에 창 끄기 등등)
+    INIT: 게임 초기화중 / ERROR: 에러 / STONE: 돌 놓기 / GAMEOVER: 게임 종류
  */
 
-import { cache } from "../matching/matching.js";
-import * as matchingJs from "../matching/matching.js";
+let status = ['INIT', 'ERROR', 'STONE', 'GAMEOVER'];
 
-let status = ['WAITING' , 'MATCHED', 'PLAYING', 'FINISHED', 'ABORTED'];
-
-let type = ['move', 'gameover'];
-
-export let currentTurn = 1; // 1 = 흑돌(선공), 2 = 백돌(후공)
-export let myRole = 0; // 0 = 미할당, 1 = 흑돌, 2 = 백돌
-
+let type = ['JOIN', 'STONE'];
 
 /* 게임 시작 시 웹소켓 오픈 */
-function openWebSocket(gameId) {
-    const socket = new WebSocket(`ws://localhost:8080/min-value?gameId=${gameId}`);
+function startGame(gameId) {
+    sockets.game = new WebSocket(`ws://localhost:8080/game/${gameId}`);
 
-    socket.onopen = () => console.log('websocket: 정상 연결');
-    socket.onerror = () => console.log('websocket: 오류');
-    socket.onclose = () => console.log('websocket: 닫힘');
+    sockets.game.onopen = () => console.log('websocket: 정상 연결');
+    sockets.game.onerror = () => console.log('websocket: 오류');
+    sockets.game.onclose = () => console.log('websocket: 닫힘');
 
     //메시지 처리
-    socket.onmessage = function(e) {
+    sockets.game.onmessage = function(e) {
         const data = JSON.parse(e.data);
         const status = data.status;
 
         if(status === status[0]) {
-            //waiting: 상대방이 아직 존재하지 않는 경우
-            handleWaitingStatus(data);
-        } else if(status === status[1]) {
-            //matched: 상대방이 들어와 매칭된 경우
-            cache.opp = data.opponent;
-
-            //돌 정하기
-            myRole = (cache.you.id.trim() === data.player1.trim()) ? 1 : 2;
-        } else if(status === status[2]) {
-            //playing:
-            const type = data.type;
-
-            if(type === type[0]) {
-                //move
-            } else if(type === type[1]) {
-                //game over
+            //INIT
+            /*
+                type: JOIN
+                role: 1 or 2
+             */
+            console.log(status[0]);
+            const sendMsg = {
+                type: 'JOIN',
+                role: myRole
             }
+            sockets.game.send(JSON.stringify(sendMsg));
+        } else if(status === status[1]) {
+            //ERROR
+            console.log(status[1]);
+
+
+        } else if(status === status[2]) {
+            //STONE
+            console.log(status[2]);
         } else if(status === status[3]) {
-            //finished
-        } else if(status === status[4]) {
-            //aborted
+            //GAMEOVER
+            console.log(status[3]);
         }
     };
-}
-
-function handleWaitingStatus(data) {
-    //1. 내 정보 넣기
-    matchingJs.renderPlayer(1, cache.you);
-
-    //2. 돌 색상 정하기 (player1: 흑돌 / player2: 백돌)
-    matchingJs.renderPlayer(0, cache.opp);
-
-    //3. 매칭 모달 띄우기
-    matchingJs.openMatchingModal();
 }

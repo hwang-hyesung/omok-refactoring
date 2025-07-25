@@ -21,23 +21,30 @@ public class GameSocket {
     public void onOpen(Session session, @PathParam("gameId") int gameId) throws IOException {
 
         // 일단 방 안 넣고 대기
-        String init = String.format("{\"senderId\":\"%s\",\"type\":\"__INIT__\"}", session.getId());
+        String init = String.format("{\"senderId\":\"%s\",\"type\":\"INIT\"}", session.getId());
         session.getBasicRemote().sendText(init);
         System.out.println("게임소켓 열림");
     }
 
     @OnMessage
-    public void onMessage(Session session, String message) throws IOException {
+    public void onMessage(Session session, @PathParam("gameId") int gameId, String message) throws IOException {
         Map<String, String> msg = parseMessage(message);
         String type = msg.get("type");
+        String gameIdStr = String.valueOf(gameId);
 
-        if ("join".equals(type)) {
-            String roomId = msg.get("roomId");
+        if ("JOIN".equals(type)) {
+            //게임 매칭 후 최초 메시지
+
+            //메시지 보낸 사람 역할
             int role = Integer.parseInt(msg.get("role"));
-            joinRoom(session, roomId, role);
-        } else if ("stone".equals(type)) {
-            String roomId = sessionRoomMap.get(session);
-            int[][] board = roomBoards.get(roomId);
+
+            //방에 참가
+            joinRoom(session, gameIdStr, role);
+        } else if ("STONE".equals(type)) {
+            //게임 진행 중 메시지
+
+            //해당 게임의 게임판 불러오기
+            int[][] board = roomBoards.get(gameIdStr);
 
             int row = Integer.parseInt(msg.get("row"));
             int col = Integer.parseInt(msg.get("col"));
@@ -45,7 +52,7 @@ public class GameSocket {
 
             // 이미 돌이 있으면 무시하거나 에러 처리
             if (board[row][col] != 0 || stone != playerRoles.get(session)) {
-                session.getBasicRemote().sendText("{\"type\":\"error\", \"message\":\"이미 돌이 놓여있는 자리입니다.\"}");
+                session.getBasicRemote().sendText("{\"type\":\"ERROR\", \"message\":\"이미 돌이 놓여있는 자리입니다.\"}");
                 return;
             }
 
@@ -53,16 +60,16 @@ public class GameSocket {
             board[row][col] = stone;
 
             // 돌 놓은 정보 브로드캐스트 (먼저)
-            broadcast(roomId, message);
+            broadcast(gameIdStr, message);
 
             // 승리 체크
             if (checkWin(board, row, col, stone)) {
-                String gameoverMsg = String.format("{\"type\":\"gameover\", \"winner\":%d}", stone);
-                broadcast(roomId, gameoverMsg);
-                roomBoards.put(roomId, new int[BOARD_SIZE][BOARD_SIZE]);
+                String gameoverMsg = String.format("{\"type\":\"GAMEOVER\", \"winner\":%d}", stone);
+                broadcast(gameIdStr, gameoverMsg);
+                roomBoards.put(gameIdStr, new int[BOARD_SIZE][BOARD_SIZE]);
             }
 
-        } else if ("gameover".equals(type)) {
+        } else if ("GAMEOVER".equals(type)) {
             // 클라이언트가 보내는 게임오버 메시지 처리 필요 없도록 변경
             String roomId = sessionRoomMap.get(session);
             broadcast(roomId, message);
@@ -153,5 +160,7 @@ public class GameSocket {
             leaveRoom(session, roomId);
         }
         System.out.println("서버 연결 종료 " + session.getId());
+
+        //todo: 매칭 소켓에 종료 알림
     }
 }
