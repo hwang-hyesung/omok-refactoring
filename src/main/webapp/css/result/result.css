@@ -20,7 +20,7 @@
 }
 
 /* 승리/패배 텍스트 영역 */
-#text {
+#result-img {
     background: no-repeat center center;
     background-size: contain;
     height: 25%;

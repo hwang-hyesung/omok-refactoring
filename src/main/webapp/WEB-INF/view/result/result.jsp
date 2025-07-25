@@ -1,17 +1,12 @@
 <script>
-    const user = {
-        userId: '${sessionScope.loginInfo.userId}',
-        total: ${sessionScope.loginInfo.totalGames},
-        win: ${sessionScope.loginInfo.winCount},
-        lose: ${sessionScope.loginInfo.loseCount}
-    };
+    const user = localStorage.getItem("loginInfo");
     const total = user.win + user.lose;
     const winRate = total > 0 ? Math.round(user.win / total * 100) : 0;
     const loseRate = total > 0 ? 100 - winRate : 0;
 </script>
 <div id="modal">
     <div id="container">
-        <div id="text"></div>
+        <div id="result-img"></div>
         <div id="info">
             <div id="user_img"></div>
             <div id="explanation">

@@ -161,7 +161,7 @@
     </div>
 </div>
 
-<script type="module" src="../../../js/game/board.js"></script>
+<script type="module" src="../../../js/game/start-game.js"></script>
 
 <%--&lt;%&ndash;여기에 웹소켓 + 매칭 관련 스크립트 추가&ndash;%&gt;--%>
 <%--<script type="module" src="${pageContext.request.contextPath}/view/sunJ_maching/js/match/modal-ui.js"></script>--%>
