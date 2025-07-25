@@ -1,3 +1,5 @@
+import {startChat} from "../game/chat.js";
+
 export const sockets = {
     matching: null,
     game: null,
@@ -94,6 +96,9 @@ export function matchInit(gameId) {
             //게임 창에 유저 정보 띄우기
             showGameProfile(player1, 1);
             showGameProfile(player2, 2);
+
+            //챗 소켓 열기
+            startChat(gameId);
         }
     }
 }
