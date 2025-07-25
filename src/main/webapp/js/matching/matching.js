@@ -1,3 +1,5 @@
+import {startChat} from "../game/chat.js";
+
 export const sockets = {
     matching: null,
     game: null,
@@ -94,6 +96,9 @@ export function matchInit(gameId) {
             //게임 창에 유저 정보 띄우기
             showGameProfile(player1, 1);
             showGameProfile(player2, 2);
+
+            //챗 소켓 열기
+            startChat(gameId);
         }
     }
 }
@@ -103,13 +108,10 @@ function handleWaitingStatus(you) {
     //1. 내 정보 넣기
     renderPlayer(1, you);
 
-    //2. 돌 색상 주입하기: WAITING status는 player1만 받음
-    setStones(you.id, you.id);
-
-    //3. 모달에 waiting 띄우기
+    //2. 모달에 waiting 띄우기
     showWaitingModal();
 
-    //4. 모달 열기
+    //3. 모달 열기
     openMatchingModal();
 }
 
@@ -136,10 +138,7 @@ function handleMatchesStatus(you, player1, player2) {
     renderPlayer(myRole, you);
     renderPlayer(oppRole, opp);
 
-    //4. 돌 색상 주입하기
-    setStones(you.id, player1.id);
-
-    //5. waiting 모달 없애고 player2 컴포넌트 띄우기
+    //4. waiting 모달 없애고 player2 컴포넌트 띄우기
     showPlayer2Component();
 
     setTimeout(() => {
@@ -157,23 +156,6 @@ function renderPlayer(role, info) {
     document.getElementById("profile" + role).style.backgroundImage = `url('../../img/profile/${info.img}.png')`;
 }
 
-// 돌 색상 정하기
-function setStones(youId, player1Id) {
-    const isPlayer1 = youId === player1Id;
-
-    const blackStone = document.querySelector(".stone-image-black");
-    const whiteStone = document.querySelector(".stone-image-white");
-
-    if(isPlayer1) {
-        //내가 player1인 경우
-        blackStone.src = "../../img/black_stone.png";
-        whiteStone.src = "../../img/white_stone.png";
-    } else {
-        //내가 player2인 경우
-        blackStone.src = "../../img/white_stone.png";
-        whiteStone.src = "../../img/black_stone.png";
-    }
-}
 
 //waiting 모달 띄우기
 function showWaitingModal() {

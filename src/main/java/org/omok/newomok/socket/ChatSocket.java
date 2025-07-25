@@ -1,9 +1,13 @@
 package org.omok.newomok.socket;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.PathParam;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,44 +20,44 @@ public class ChatSocket {
     @OnOpen
     public void onOpen(Session session, @PathParam("gameId") String gameId) throws IOException {
         // gameId 방이 없으면 새로 만들고, 세션 추가
-        chatRooms.computeIfAbsent(gameId, k -> Collections.synchronizedSet(new HashSet<>())).add(session);
+        chatRooms.putIfAbsent(gameId, new HashSet<>());
+        chatRooms.get(gameId).add(session);
         session.getUserProperties().put("gameId", gameId);
 
         // 접속자에게 초기 메시지 전달
-        String init = String.format("{\"senderId\":\"%s\",\"text\":\"__INIT__\"}", session.getId());
+        String init = String.format("{\"senderId\":\"%s\",\"status\":\"INIT\"}", session.getId());
         session.getBasicRemote().sendText(init);
 
-        System.out.println("새 연결: 세션ID=" + session.getId() + ", 게임방=" + gameId);
-        System.out.println("채팅소켓 열림");
+        System.out.println("new connection - chat socket: sessionID=" + session.getId() + ", game room=" + gameId);
     }
 
     @OnMessage
-    public void onMessage(Session session, String message) throws IOException {
-        String senderId = session.getId();
-        String gameId = (String) session.getUserProperties().get("gameId");
-        if (gameId == null) {
-            // 게임방 정보가 없으면 무시
-            return;
-        }
+    public void onMessage(Session session, String message, @PathParam("gameId") String gameId) throws IOException {
+        System.out.println("chat socket - message: sessionID=" + session.getId() + ", game room=" + gameId);
+
+        if (gameId == null) return;
 
         Set<Session> room = chatRooms.get(gameId);
-        if (room == null) {
-            // 방이 없으면 무시
-            return;
-        }
+        if (room == null) return;
 
-        // 메시지 내 특수문자 이스케이프 처리
-        String escaped = message
+        // JSON 파싱
+        Gson gson = new Gson();
+        JsonObject json = gson.fromJson(message, JsonObject.class);
+
+        String senderId = json.has("senderId") ? json.get("senderId").getAsString() : session.getId();
+        String text = json.has("message") ? json.get("message").getAsString() : "";
+
+        // JSON escape
+        String escaped = text
                 .replaceAll("\\\\", "\\\\\\\\")
                 .replaceAll("\"", "\\\\\"")
                 .replaceAll("\n", "\\\\n");
 
-        // JSON 형식 메시지 생성
+        // 전송할 payload 생성
         String payload = String.format(
-                "{\"senderId\":\"%s\",\"text\":\"%s\"}", senderId, escaped
+                "{\"senderId\":\"%s\",\"text\":\"%s\",\"status\":\"CHAT\"}", senderId, escaped
         );
 
-        // 동기화하여 해당 방의 모든 세션에 메시지 전송
         synchronized (room) {
             for (Session s : room) {
                 if (s.isOpen()) {
@@ -63,9 +67,9 @@ public class ChatSocket {
         }
     }
 
+
     @OnClose
-    public void onClose(Session session) {
-        String gameId = (String) session.getUserProperties().get("gameId");
+    public void onClose(Session session, @PathParam("gameId") String gameId) {
         if (gameId != null) {
             Set<Session> room = chatRooms.get(gameId);
             if (room != null) {
@@ -78,12 +82,12 @@ public class ChatSocket {
             }
         }
 
-        System.out.println("연결 종료: 세션ID=" + session.getId());
+        System.out.println("chat socket - connection end: sessionID=" + session.getId());
     }
 
     @OnError
-    public void onError(Session session, Throwable thr) {
-        System.err.println("에러 발생: 세션ID=" + (session != null ? session.getId() : "null"));
+    public void onError(Session session, Throwable thr, @PathParam("gameId") String gameId) {
+        System.err.println("chat socket - error: sessionID=" + (session != null ? session.getId() : "null"));
         thr.printStackTrace();
     }
 }
