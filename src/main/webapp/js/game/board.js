@@ -145,7 +145,6 @@ export function initBoardEvents(sendStone, currentTurn, myRole) {
     });
 
     boardElement.addEventListener('click', (e) => {
-        console.log("MYROLE is " + myRole + ", CURRENTTURN is" + currentTurn);
         const cell = getCellFromMouseEvent(e);
         if (cell) sendStone(cell.row, cell.col);
     });

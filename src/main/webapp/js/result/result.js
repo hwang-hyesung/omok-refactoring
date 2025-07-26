@@ -1,21 +1,11 @@
 
 const user = JSON.parse(localStorage.getItem("loginInfo"));
 export function openModal(res) {
-    console.log("open" + res);
+
     const win = parseInt(user.win || 0, 10);
     const lose = parseInt(user.lose || 0, 10);
     const total = win + lose;
     const loseRate = (100-user.rate).toString();
-    console.log("result: " + user);
-
-    console.log("user:", user);
-    console.log("user.id:", user.id);
-    console.log("user.win:", user.win);
-    console.log("user.lose:", user.lose);
-    console.log("user.rate:", user.rate);
-    console.log("total:", total);
-    console.log("loseRate:", loseRate);
-
 
     // DOM에 데이터 넣기
     document.getElementById("user_id_text").innerHTML = `${user.id}`;

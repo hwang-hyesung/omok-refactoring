@@ -23,9 +23,6 @@ export function startGame(gameId) {
 
         if(type === types[0]) {
             //INIT
-            console.log("@@@" + data);
-            console.log(types[0]);
-
             const sendMsg = {
                 type: 'JOIN',
                 role: myRole
@@ -34,20 +31,15 @@ export function startGame(gameId) {
             sockets.game.send(JSON.stringify(sendMsg));
         } else if(type === types[1]) {
             //STONE
-            console.log(types[1]);
             board.board[data.row][data.col] = data.stone;
             board.drawStone(data.row, data.col, data.stone);
             setCurrentTurn(getCurrentTurn()===1?2:1);
-            console.log("NOW: " + currentTurn);
             board.saveBoardToSession(getCurrentTurn());
         } else if(type === types[2]) {
             //GAMEOVER
-            console.log(data.winner);
-            console.log(data.winner===myRole ? 'win' : 'lose');
             openModal(data.winner===myRole ? 'win' : 'lose');
         } else if(type === types[3]) {
             //ERROR
-            console.log(types[3]);
             alert(data.message);
         }
     };
@@ -60,7 +52,6 @@ export function sendStone(row, col) {
         row, col,
         stone: myRole
     }));
-    console.log("SENDED: " + row + ", " + col);
 }
 
 
