@@ -1,3 +1,5 @@
+import {showLoading, hideLoading} from "./loading.js";
+
 const pencilSrc = `/img/pencil_icon.png`;
 const checkSrc = `/img/check_icon.png`;
 let editing = false; //bio 수정 상태 flag
@@ -52,6 +54,8 @@ document.addEventListener("DOMContentLoaded", function() {
     /* 시작버튼 리스너 */
     document.getElementById("start_btn").addEventListener('click', function(e) {
         e.preventDefault();
+
+        showLoading();
 
         const startBtn = this;
         startBtn.disabled = true;
@@ -225,5 +229,8 @@ function startGame() {
             const gameId = data.game.gameId;
             //로케이션 경로 변경
             location.href = `/omok/play?gameId=${gameId}`;
+        })
+        .finally(data => {
+            hideLoading();
         });
 }

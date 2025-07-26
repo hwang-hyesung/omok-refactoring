@@ -45,6 +45,7 @@
         </button>
     </form>
 </div>
+<%@ include file="loading.jsp"%>
 <div id="full_box">
     <div id="section1">
         <!-- 랭킹 -->
