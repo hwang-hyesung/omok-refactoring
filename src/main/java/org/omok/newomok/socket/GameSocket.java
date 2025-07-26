@@ -1,11 +1,14 @@
 package org.omok.newomok.socket;
 
+import lombok.extern.slf4j.Slf4j;
+
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.*;
 
+@Slf4j
 @ServerEndpoint("/game/{gameId}")
 public class GameSocket {
     private static Map<String, Set<Session>> rooms = new HashMap<>();
@@ -14,8 +17,9 @@ public class GameSocket {
     private static Map<Session, Integer> playerRoles = new HashMap<>(); // 1=흑, 2=백
 
     // 방별로 15x15 바둑판 상태 관리, 0=빈칸, 1=흑, 2=백
-    private static Map<String, int[][]> roomBoards = new HashMap<>();
+    private static final Map<String, int[][]> roomBoards = new HashMap<>();
     private static final int BOARD_SIZE = 15;
+    private static final Map<String, Integer> roomTurn = new HashMap<>();
 
     @OnOpen
     public void onOpen(Session session, @PathParam("gameId") int gameId) throws IOException {
@@ -42,6 +46,7 @@ public class GameSocket {
             joinRoom(session, gameIdStr, role);
         } else if ("STONE".equals(type)) {
             //게임 진행 중 메시지
+            System.out.println(playerRoles.get(session));
 
             //해당 게임의 게임판 불러오기
             int[][] board = roomBoards.get(gameIdStr);
@@ -50,9 +55,15 @@ public class GameSocket {
             int col = Integer.parseInt(msg.get("col"));
             int stone = Integer.parseInt(msg.get("stone"));
 
-            // 이미 돌이 있으면 무시하거나 에러 처리
-            if (board[row][col] != 0 || stone != playerRoles.get(session)) {
+            // 이미 돌이 있거나 순서가 아니면 무시하거나 에러 처리
+            if (board[row][col] != 0 ) {
                 session.getBasicRemote().sendText("{\"type\":\"ERROR\", \"message\":\"이미 돌이 놓여있는 자리입니다.\"}");
+                return;
+            }
+
+            int currentTurn = roomTurn.get(gameIdStr);
+            if (stone != currentTurn) {
+                session.getBasicRemote().sendText("{\"type\":\"ERROR\", \"message\":\"지금은 상대방의 차례입니다.\"}");
                 return;
             }
 
@@ -67,6 +78,9 @@ public class GameSocket {
                 String gameoverMsg = String.format("{\"type\":\"GAMEOVER\", \"winner\":%d}", stone);
                 broadcast(gameIdStr, gameoverMsg);
                 roomBoards.put(gameIdStr, new int[BOARD_SIZE][BOARD_SIZE]);
+            } else {
+                // 턴 전환
+                roomTurn.put(gameIdStr, 3 - stone);
             }
 
         }
@@ -78,6 +92,8 @@ public class GameSocket {
         roomBoards.putIfAbsent(roomId, new int[BOARD_SIZE][BOARD_SIZE]);
         playerRoles.put(session, role);
         sessionRoomMap.put(session, roomId);
+        roomTurn.putIfAbsent(String.valueOf(roomId), 1);
+
         // 새 방 입장 시 클라이언트에 보드 초기화 메시지 전송
         session.getBasicRemote().sendText(String.format("{\"type\":\"role\", \"role\":%d}", role));
     }
@@ -99,6 +115,7 @@ public class GameSocket {
         }
         playerRoles.remove(session);
         sessionRoomMap.remove(session);
+        roomTurn.remove(roomId);
     }
 
     private void broadcast(String roomId, String payload) throws IOException {

@@ -1,10 +1,46 @@
-export function openModal(winnerId) {
-    if(winnerId === user.userId){
-        document.getElementById("result-img").backgroundImage = "/img/win-text.png";
-        document.getElementById("user_img").backgroundImage = `/img/profile/${user.image}.png`;
+
+const user = JSON.parse(localStorage.getItem("loginInfo"));
+export function openModal(res) {
+    console.log("open" + res);
+    const win = parseInt(user.win || 0, 10);
+    const lose = parseInt(user.lose || 0, 10);
+    const total = win + lose;
+    const loseRate = (100-user.rate).toString();
+    console.log("result: " + user);
+
+    console.log("user:", user);
+    console.log("user.id:", user.id);
+    console.log("user.win:", user.win);
+    console.log("user.lose:", user.lose);
+    console.log("user.rate:", user.rate);
+    console.log("total:", total);
+    console.log("loseRate:", loseRate);
+
+
+    // DOM에 데이터 넣기
+    document.getElementById("user_id_text").innerHTML = `${user.id}`;
+    document.getElementById("record_text").innerHTML = `${total}전 ${user.win}승 ${user.lose}패`;
+    document.getElementById("win_bar").style.width = Number(user.rate)+'%';
+    document.getElementById("lose_bar").style.width = loseRate+'%';
+    document.getElementById("win_bar").innerHTML = user.rate+'%';
+    document.getElementById("lose_bar").innerHTML = loseRate+'%';
+    document.getElementById("win_label").innerHTML = `승 (${user.rate}%)`;
+    document.getElementById("lose_label").innerHTML = `패 (${loseRate}%)`;
+
+    if(res === 'win'){
+        document.getElementById("result-img").style.backgroundImage = `url('/img/win_text.png')`;
+        document.getElementById("user_img").style.backgroundImage = `url('/img/profile/${user.img}.png')`;
+
     } else {
-        document.getElementById("result-img").backgroundImage = "/img/lose-text.png";
-        document.getElementById("user_img").backgroundImage = `/img/profile/${user.image}_sad.png`;
+        document.getElementById("result-img").style.backgroundImage = `url('/img/lose_text.png')`;
+        document.getElementById("user_img").style.backgroundImage = `url('/img/profile/${user.img}_sad.png')`;
+
     }
-    document.getElementById("result-modal").display = 'flex';
-};
+    document.getElementById("result-modal").style.display = 'flex';
+}
+
+document.getElementById("go_main_btn").addEventListener("click", (e) => {
+    localStorage.removeItem("oppInfo");
+    sessionStorage.clear();
+    window.location.href = "/omok/main";
+});

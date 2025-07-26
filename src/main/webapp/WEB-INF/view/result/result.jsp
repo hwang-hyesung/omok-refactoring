@@ -1,30 +1,33 @@
-<script>
-    const user = localStorage.getItem("loginInfo");
-    const total = user.win + user.lose;
-    const winRate = total > 0 ? Math.round(user.win / total * 100) : 0;
-    const loseRate = total > 0 ? 100 - winRate : 0;
-</script>
-<div id="modal">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>결과 모달</title>
+</head>
+<body>
+<div id="result-modal">
     <div id="container">
         <div id="result-img"></div>
         <div id="info">
             <div id="user_img"></div>
             <div id="explanation">
-                <div>아이디: ${user.userId}</div>
-                <div>${total}전 ${user.win}승 ${user.lose}패</div>
+                <div id="user_id_text"></div>
+                <div id="record_text"></div>
                 <div id="bar">
-                    <div id="win_bar">${user.win}</div>
-                    <div id="lose_bar">${user.lose}</div>
+                    <div id="win_bar"></div>
+                    <div id="lose_bar"></div>
                 </div>
                 <div id="bar_label">
-                    <div id="win_label">승 (${winRate}%)</div>
-                    <div id="lose_label">패 (${loseRate}%)</div>
+                    <div id="win_label"></div>
+                    <div id="lose_label"></div>
                 </div>
             </div>
         </div>
         <div id="btn">
-            <button id="go_main_btn">메인 메뉴</button>
-            <!--            <button id="re_btn">다시 시작</button>-->
+            <button id="go_main_btn">Main</button>
         </div>
     </div>
 </div>
+<script type="module" src="/js/result/result.js"></script>
+</body>
+</html>

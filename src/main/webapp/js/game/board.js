@@ -1,5 +1,5 @@
 //오목 돌 배치
-import {myRole} from "../matching/matching.js";
+import { myRole, getCurrentTurn, setCurrentTurn } from "../matching/matching.js";
 
 export const boardSize = 15;
 export const board = Array.from({ length: boardSize }, () => Array(boardSize).fill(0));
@@ -13,7 +13,6 @@ export const offsetY = -2;
 
 let gridStartX, gridStartY, cellSizeX, cellSizeY;
 export let hoverStone = null;
-
 // 보드 크기 및 셀 크기
 export function calculateGridMetrics() {
     const rect = boardImage.getBoundingClientRect();
@@ -48,95 +47,20 @@ export function getCellFromMouseEvent(e) {
 
     return { row, col };
 }
-//
-// // 새로고침 하면 세션에 저장한 돌 정보 불러오기
-// window.onload = () => {
-//     calculateGridMetrics();
-//
-//     const savedBoard = sessionStorage.getItem('board');
-//     const savedTurn = sessionStorage.getItem('turn');
-//
-//     if (savedBoard) {
-//         const parsedBoard = JSON.parse(savedBoard);
-//         for (let r = 0; r < boardSize; r++) {
-//             for (let c = 0; c < boardSize; c++) {
-//                 board[r][c] = parsedBoard[r][c];
-//                 if (board[r][c] !== 0) {
-//                     drawStone(r, c, board[r][c]);
-//                 }
-//             }
-//         }
-//     }
-//
-//     if (savedTurn) {
-//         currentTurn = parseInt(savedTurn);
-//     }
-// };
-//
-// window.addEventListener('resize', () => {
-//     calculateGridMetrics();
-//     redrawStones();
-//     if (hoverStone) {
-//         hoverStone.style.display = 'none'; // 화면 크기 변경 시 hover 숨김
-//     }
-// });
-//
-// boardElement.addEventListener("mousemove", (e) => {
-//     if (!hoverStone) createHoverStone();
-//     if (myRole !== currentTurn) {
-//         if (hoverStone) hoverStone.style.display = 'none';
-//         return;
-//     }
-//     const rect = boardImage.getBoundingClientRect();
-//     const x = e.clientX - rect.left;
-//     const y = e.clientY - rect.top;
-//
-//     const cell = getCellFromMousePosition(x, y);
-//
-//     if (!cell || board[cell.row][cell.col] !== 0) {
-//         hoverStone.style.display = 'none';
-//         return;
-//     }
-//
-//     hoverStone.style.display = 'block';
-//
-//     const left = gridStartX + cell.col * cellSizeX;
-//     const top = gridStartY + cell.row * cellSizeY;
-//
-//     hoverStone.style.left = `${left}px`;
-//     hoverStone.style.top = `${top}px`;
-//     hoverStone.className = `stone hover ${currentTurn === 1 ? 'black' : 'white'}`;
-// });
-//
-// boardElement.addEventListener("mouseleave", () => {
-//     if (hoverStone) hoverStone.style.display = 'none';
-// });
-//
-// //클릭시 돌 두기
-// boardElement.addEventListener("click", (e) => {
-//     const rect = boardImage.getBoundingClientRect();
-//     const x = e.clientX - rect.left;
-//     const y = e.clientY - rect.top;
-//
-//     const cell = getCellFromMousePosition(x, y);
-//     if (!cell) return;
-//
-//     placeStone(cell.row, cell.col);
-// });
 
 // hover
 export function createHoverStone() {
     hoverStone = document.createElement("div");
-    hoverStone.className = "stone hover";
+    hoverStone.className = `stone hover ${myRole === 1 ? 'black' : 'white'}`;
     boardElement.appendChild(hoverStone);
 }
 
-export function updateHoverStonePosition(row, col, color) {
+export function updateHoverStonePosition(row, col) {
     if (!hoverStone) createHoverStone();
     hoverStone.style.display = 'block';
     hoverStone.style.left = `${gridStartX + col * cellSizeX}px`;
     hoverStone.style.top = `${gridStartY + row * cellSizeY}px`;
-    hoverStone.className = `stone hover ${color === 1 ? 'black' : 'white'}`;
+    hoverStone.className = `stone hover ${myRole === 1 ? 'black' : 'white'}`;
 }
 
 export function drawStone(row, col, color) {
@@ -193,6 +117,10 @@ export function loadBoardFromSession() {
 export function initBoardEvents(sendStone, currentTurn, myRole) {
     calculateGridMetrics();
 
+    boardElement.addEventListener('beforeunload', (e) => {
+        sessionStorage.clear();
+    });
+
     window.addEventListener('resize', () => {
         calculateGridMetrics();
         redrawStones();
@@ -201,15 +129,15 @@ export function initBoardEvents(sendStone, currentTurn, myRole) {
 
     boardElement.addEventListener('mousemove', (e) => {
         const cell = getCellFromMouseEvent(e);
-        if (!cell || board[cell.row][cell.col] !== 0 || myRole !== currentTurn) {
+        if (!cell || board[cell.row][cell.col] !== 0 || myRole !== getCurrentTurn()) {
             if (hoverStone) hoverStone.style.display = 'none';
             return;
         }
-        if (myRole !== currentTurn) {
-        if (hoverStone) hoverStone.style.display = 'none';
+        if (myRole !== getCurrentTurn()) {
+            if (hoverStone) hoverStone.style.display = 'none';
             return;
         }
-        updateHoverStonePosition(cell.row, cell.col, currentTurn);
+        updateHoverStonePosition(cell.row, cell.col);
     });
 
     boardElement.addEventListener('mouseleave', (e) => {
@@ -217,8 +145,32 @@ export function initBoardEvents(sendStone, currentTurn, myRole) {
     });
 
     boardElement.addEventListener('click', (e) => {
+        console.log("MYROLE is " + myRole + ", CURRENTTURN is" + currentTurn);
         const cell = getCellFromMouseEvent(e);
         if (cell) sendStone(cell.row, cell.col);
     });
+
+    window.onload = () => {
+        calculateGridMetrics();
+
+        const savedBoard = sessionStorage.getItem('board');
+        const savedTurn = sessionStorage.getItem('turn');
+
+        if (savedBoard) {
+            const parsedBoard = JSON.parse(savedBoard);
+            for (let r = 0; r < boardSize; r++) {
+                for (let c = 0; c < boardSize; c++) {
+                    board[r][c] = parsedBoard[r][c];
+                    if (board[r][c] !== 0) {
+                        drawStone(r, c, board[r][c]);
+                    }
+                }
+            }
+        }
+
+        if (savedTurn) {
+            setCurrentTurn(parseInt(savedTurn));
+        }
+    };
 }
 

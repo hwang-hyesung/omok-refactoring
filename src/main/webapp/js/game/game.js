@@ -1,13 +1,12 @@
-import { sockets, myRole } from "../matching/matching.js";
+import {sockets, myRole, getCurrentTurn, setCurrentTurn, currentTurn} from "../matching/matching.js";
 import * as board from './board.js';
-import {openModal} from "../result/result";
+import {openModal} from "../result/result.js";
 import {loadBoardFromSession} from "./board.js";
 /* 게임 상태 변수
     INIT: 게임 초기화중 / ERROR: 에러 / STONE: 돌 놓기 / GAMEOVER: 게임 종류
  */
 
 let types = ['INIT', 'STONE', 'GAMEOVER', 'ERROR'];
-export let currentTurn = 1;
 
 /* 게임 시작 시 웹소켓 오픈 */
 export function startGame(gameId) {
@@ -24,24 +23,28 @@ export function startGame(gameId) {
 
         if(type === types[0]) {
             //INIT
+            console.log("@@@" + data);
             console.log(types[0]);
-            myRole = data.role;
+
             const sendMsg = {
                 type: 'JOIN',
                 role: myRole
             }
+            console.log("JOIN SEND" + sendMsg.role);
             sockets.game.send(JSON.stringify(sendMsg));
         } else if(type === types[1]) {
             //STONE
             console.log(types[1]);
-            board.board[data.row][data.col] = data.color;
-            board.drawStone(data.row, data.col, data.color);
-            currentTurn = data.color === 1 ? 2 : 1;
-            board.saveBoardToSession(currentTurn);
+            board.board[data.row][data.col] = data.stone;
+            board.drawStone(data.row, data.col, data.stone);
+            setCurrentTurn(getCurrentTurn()===1?2:1);
+            console.log("NOW: " + currentTurn);
+            board.saveBoardToSession(getCurrentTurn());
         } else if(type === types[2]) {
             //GAMEOVER
-            console.log(types[2]);
-            openModal(data.winner);
+            console.log(data.winner);
+            console.log(data.winner===myRole ? 'win' : 'lose');
+            openModal(data.winner===myRole ? 'win' : 'lose');
         } else if(type === types[3]) {
             //ERROR
             console.log(types[3]);
@@ -49,23 +52,15 @@ export function startGame(gameId) {
         }
     };
 
-    currentTurn = loadBoardFromSession();
 }
 
 export function sendStone(row, col) {
-    if (myRole !== currentTurn || board.board[row][col] !== 0 || myRole === 0) return;
-
-    board.board[row][col] = myRole;
-    board.drawStone(row, col, myRole);
-    board.saveBoardToSession(currentTurn);
-
-    currentTurn = myRole === 1 ? 2 : 1;
-
     sockets.game.send(JSON.stringify({
         type: 'STONE',
         row, col,
-        color: myRole
+        stone: myRole
     }));
+    console.log("SENDED: " + row + ", " + col);
 }
 
 

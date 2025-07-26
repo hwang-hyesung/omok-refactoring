@@ -1,4 +1,6 @@
 import {startChat} from "../game/chat.js";
+import * as board from '../game/board.js';
+import { startGame, sendStone } from '../game/game.js';
 
 export const sockets = {
     matching: null,
@@ -12,10 +14,16 @@ export const sockets = {
  */
 
 export let myRole = 0; //0: 미할당 / 1: 흑 / 2: 백
-export let currentTurn = 1; //1: 흑돌(선공) / 2: 백돌(후공)
-
-
+export let currentTurn = 1;
 const user = JSON.parse(localStorage.getItem("loginInfo"));
+
+export function setCurrentTurn(value) {
+    currentTurn = value;
+}
+
+export function getCurrentTurn() {
+    return currentTurn;
+}
 
 window.addEventListener("DOMContentLoaded", () => {
    //url에 gameId parameter 확인
@@ -97,8 +105,11 @@ export function matchInit(gameId) {
             showGameProfile(player1, 1);
             showGameProfile(player2, 2);
 
-            //챗 소켓 열기
+            //소켓들 열기
             startChat(gameId);
+            startGame(gameId);
+
+            board.initBoardEvents(sendStone, getCurrentTurn(), myRole);
         }
     }
 }
@@ -130,9 +141,9 @@ function handleMatchesStatus(you, player1, player2) {
         opp = player1;
     }
 
-    localStorage.setItem("oppInfo", opp);
+    localStorage.setItem("oppInfo", JSON.stringify(opp));
     //2. currentTurn 설정
-    currentTurn = 1;
+    setCurrentTurn(1);
 
     //3. 정보
     renderPlayer(myRole, you);
