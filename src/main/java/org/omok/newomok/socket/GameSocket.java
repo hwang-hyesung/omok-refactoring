@@ -46,8 +46,6 @@ public class GameSocket {
             joinRoom(session, gameIdStr, role);
         } else if ("STONE".equals(type)) {
             //게임 진행 중 메시지
-            System.out.println(playerRoles.get(session));
-
             //해당 게임의 게임판 불러오기
             int[][] board = roomBoards.get(gameIdStr);
 
