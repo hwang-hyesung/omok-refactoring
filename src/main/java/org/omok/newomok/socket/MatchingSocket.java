@@ -15,6 +15,8 @@ import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.PathParam;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,7 +40,11 @@ public class MatchingSocket {
         int gameId = Integer.parseInt(session.getRequestParameterMap().get("gameId").get(0));
 
         //2. 방에 세션 추가
-        gameRoomMap.computeIfAbsent(gameId, k -> ConcurrentHashMap.newKeySet()).add(session);
+        Set<Session> set = gameRoomMap.computeIfAbsent(gameId, k -> Collections.synchronizedSet(new HashSet<>()));
+        synchronized (set) {
+            set.add(session);
+        }
+
         sessionRoomMap.put(session, gameId);
 
         // 접속 인원 수 확인
