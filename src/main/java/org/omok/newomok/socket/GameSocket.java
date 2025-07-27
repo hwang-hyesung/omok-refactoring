@@ -7,19 +7,20 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @ServerEndpoint("/game/{gameId}")
 public class GameSocket {
-    private static Map<String, Set<Session>> rooms = new HashMap<>();
-    private static Map<Session, String> sessionRoomMap = new HashMap<>();
-    private static Map<String, List<Session>> roomPlayers = new HashMap<>();
-    private static Map<Session, Integer> playerRoles = new HashMap<>(); // 1=흑, 2=백
+    private static final Map<String, Set<Session>> rooms = new ConcurrentHashMap<>();
+    private static final Map<Session, String> sessionRoomMap = new ConcurrentHashMap<>();
+    private static final Map<Session, Integer> playerRoles = new ConcurrentHashMap<>();
 
     // 방별로 15x15 바둑판 상태 관리, 0=빈칸, 1=흑, 2=백
-    private static final Map<String, int[][]> roomBoards = new HashMap<>();
+    private static final Map<String, int[][]> roomBoards = new ConcurrentHashMap<>();
+    private static final Map<String, Integer> roomTurn = new ConcurrentHashMap<>();
     private static final int BOARD_SIZE = 15;
-    private static final Map<String, Integer> roomTurn = new HashMap<>();
+
 
     @OnOpen
     public void onOpen(Session session, @PathParam("gameId") int gameId) throws IOException {
@@ -27,7 +28,7 @@ public class GameSocket {
         // 일단 방 안 넣고 대기
         String init = String.format("{\"senderId\":\"%s\",\"type\":\"INIT\"}", session.getId());
         session.getBasicRemote().sendText(init);
-        System.out.println("게임소켓 열림");
+        System.out.println("new connection - game socket: sessionID=" + session.getId() + ", game room=" + gameId);
     }
 
     @OnMessage
@@ -46,46 +47,55 @@ public class GameSocket {
             joinRoom(session, gameIdStr, role);
         } else if ("STONE".equals(type)) {
             //게임 진행 중 메시지
+            System.out.println("game socket - playing: sessionID=" + session.getId() + ", game room=" + gameId + ", role=" + playerRoles.get(session));
+
             //해당 게임의 게임판 불러오기
             int[][] board = roomBoards.get(gameIdStr);
 
-            int row = Integer.parseInt(msg.get("row"));
-            int col = Integer.parseInt(msg.get("col"));
-            int stone = Integer.parseInt(msg.get("stone"));
+            synchronized (board) {
+                int row = Integer.parseInt(msg.get("row"));
+                int col = Integer.parseInt(msg.get("col"));
+                int stone = Integer.parseInt(msg.get("stone"));
 
-            // 이미 돌이 있거나 순서가 아니면 무시하거나 에러 처리
-            if (board[row][col] != 0 ) {
-                session.getBasicRemote().sendText("{\"type\":\"ERROR\", \"message\":\"이미 돌이 놓여있는 자리입니다.\"}");
-                return;
-            }
+                //턴 확인
+                int currentTurn = roomTurn.get(gameIdStr);
+                if (stone != currentTurn) {
+                    session.getBasicRemote().sendText("{\"type\":\"ERROR\", \"message\":\"지금은 상대방의 차례입니다.\"}");
+                    return;
+                }
 
-            int currentTurn = roomTurn.get(gameIdStr);
-            if (stone != currentTurn) {
-                session.getBasicRemote().sendText("{\"type\":\"ERROR\", \"message\":\"지금은 상대방의 차례입니다.\"}");
-                return;
-            }
+                // 이미 돌이 있거나 순서가 아니면 무시하거나 에러 처리
+                if (board[row][col] != 0 ) {
+                    session.getBasicRemote().sendText("{\"type\":\"ERROR\", \"message\":\"이미 돌이 놓여있는 자리입니다.\"}");
+                    return;
+                }
 
-            // 돌 놓기
-            board[row][col] = stone;
+                // 돌 놓기
+                board[row][col] = stone;
 
-            // 돌 놓은 정보 브로드캐스트 (먼저)
-            broadcast(gameIdStr, message);
+                // 돌 놓은 정보 브로드캐스트 (먼저)
+                broadcast(gameIdStr, message);
 
-            // 승리 체크
-            if (checkWin(board, row, col, stone)) {
-                String gameoverMsg = String.format("{\"type\":\"GAMEOVER\", \"winner\":%d}", stone);
-                broadcast(gameIdStr, gameoverMsg);
-                roomBoards.put(gameIdStr, new int[BOARD_SIZE][BOARD_SIZE]);
-            } else {
-                // 턴 전환
-                roomTurn.put(gameIdStr, 3 - stone);
+                // 승리 체크
+                if (checkWin(board, row, col, stone)) {
+                    String gameoverMsg = String.format("{\"type\":\"GAMEOVER\", \"winner\":%d}", stone);
+                    broadcast(gameIdStr, gameoverMsg);
+                    roomBoards.put(gameIdStr, new int[BOARD_SIZE][BOARD_SIZE]);
+                } else {
+                    // 턴 전환
+                    roomTurn.put(gameIdStr, 3 - stone);
+                }
             }
 
         }
     }
 
     private void joinRoom(Session session, String roomId, int role) throws IOException {
-        rooms.computeIfAbsent(roomId, k -> Collections.synchronizedSet(new HashSet<>())).add(session);
+        Set<Session> set = rooms.computeIfAbsent(roomId, k -> Collections.synchronizedSet(new HashSet<>()));
+        synchronized (set) {
+            set.add(session);
+        }
+
         // 새 방 입장 시 보드 초기화 (기존 없으면 초기화)
         roomBoards.putIfAbsent(roomId, new int[BOARD_SIZE][BOARD_SIZE]);
         playerRoles.put(session, role);
@@ -99,18 +109,21 @@ public class GameSocket {
     private void leaveRoom(Session session, String roomId) {
         Set<Session> roomClients = rooms.get(roomId);
         if (roomClients != null) {
-            roomClients.remove(session);
-            if (roomClients.isEmpty()) {
-                rooms.remove(roomId);
-                roomBoards.remove(roomId);
-                roomPlayers.remove(roomId);
+            synchronized (roomClients) {
+                roomClients.remove(session);
+                if (roomClients.isEmpty()) {
+                    rooms.remove(roomId);
+                    roomBoards.remove(roomId);
+                }
             }
         }
 
-        List<Session> players = roomPlayers.get(roomId);
+        Set<Session> players = rooms.get(roomId);
+
         if (players != null) {
             players.remove(session);
         }
+
         playerRoles.remove(session);
         sessionRoomMap.remove(session);
         roomTurn.remove(roomId);
@@ -168,6 +181,6 @@ public class GameSocket {
     public void onClose(@PathParam("gameId") int gameId, Session session) {
         String gameIdStr = String.valueOf(gameId);
         leaveRoom(session, gameIdStr);
-        System.out.println("서버 연결 종료 " + session.getId());
+        System.out.println("game socket - connection end: sessionID=" + session.getId());
     }
 }

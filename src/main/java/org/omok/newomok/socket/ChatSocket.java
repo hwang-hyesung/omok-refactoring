@@ -20,8 +20,11 @@ public class ChatSocket {
     @OnOpen
     public void onOpen(Session session, @PathParam("gameId") String gameId) throws IOException {
         // gameId 방이 없으면 새로 만들고, 세션 추가
-        chatRooms.putIfAbsent(gameId, new HashSet<>());
-        chatRooms.get(gameId).add(session);
+        Set<Session> set = chatRooms.computeIfAbsent(gameId, k -> Collections.synchronizedSet(new HashSet<>()));
+        synchronized (set) {
+            set.add(session);
+        }
+
         session.getUserProperties().put("gameId", gameId);
 
         // 접속자에게 초기 메시지 전달
