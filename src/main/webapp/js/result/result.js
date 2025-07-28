@@ -17,14 +17,16 @@ export function openModal(res) {
     document.getElementById("win_label").innerHTML = `승 (${user.rate}%)`;
     document.getElementById("lose_label").innerHTML = `패 (${loseRate}%)`;
 
-    if(res === 'win'){
+    if(res){
         document.getElementById("result-img").style.backgroundImage = `url('/img/win_text.png')`;
         document.getElementById("user_img").style.backgroundImage = `url('/img/profile/${user.img}.png')`;
-
+        const resSound = new Audio("../../../music/Power up.mp3");
+        resSound.play();
     } else {
         document.getElementById("result-img").style.backgroundImage = `url('/img/lose_text.png')`;
         document.getElementById("user_img").style.backgroundImage = `url('/img/profile/${user.img}_sad.png')`;
-
+        const resSound = new Audio("../../../music/Power up.mp3");
+        resSound.play();
     }
     document.getElementById("result-modal").style.display = 'flex';
 }

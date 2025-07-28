@@ -73,6 +73,9 @@ export function drawStone(row, col, color) {
     stone.style.left = `${left}px`;
     stone.style.top = `${top}px`;
 
+    const stoneSound = new Audio("../../../music/stonesound.mp3");
+    stoneSound.play();
+
     boardElement.appendChild(stone);
 }
 
@@ -149,12 +152,12 @@ export function initBoardEvents(sendStone, currentTurn, myRole) {
         if (cell) sendStone(cell.row, cell.col);
     });
 
-    window.onload = () => {
+    window.addEventListener('reload', () => {
         calculateGridMetrics();
 
         const savedBoard = sessionStorage.getItem('board');
         const savedTurn = sessionStorage.getItem('turn');
-
+        console.log("RELOAD");
         if (savedBoard) {
             const parsedBoard = JSON.parse(savedBoard);
             for (let r = 0; r < boardSize; r++) {
@@ -170,6 +173,6 @@ export function initBoardEvents(sendStone, currentTurn, myRole) {
         if (savedTurn) {
             setCurrentTurn(parseInt(savedTurn));
         }
-    };
+    });
 }
 

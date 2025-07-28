@@ -24,10 +24,19 @@ public class GameSocket {
 
     @OnOpen
     public void onOpen(Session session, @PathParam("gameId") int gameId) throws IOException {
+//
+//        // 일단 방 안 넣고 대기
+//        String init = String.format("{\"senderId\":\"%s\",\"type\":\"INIT\"}", session.getId());
+//        session.getBasicRemote().sendText(init);
+//        System.out.println("new connection - game socket: sessionID=" + session.getId() + ", game room=" + gameId);
+        Set<Session> set = rooms.computeIfAbsent(String.valueOf(gameId), k -> Collections.synchronizedSet(new HashSet<>()));
+        synchronized (set) {
+            set.add(session);
+        }
 
-        // 일단 방 안 넣고 대기
         String init = String.format("{\"senderId\":\"%s\",\"type\":\"INIT\"}", session.getId());
         session.getBasicRemote().sendText(init);
+
         System.out.println("new connection - game socket: sessionID=" + session.getId() + ", game room=" + gameId);
     }
 

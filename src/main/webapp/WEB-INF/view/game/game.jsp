@@ -59,10 +59,7 @@
     int player1Rate = player1Total > 0 ? (int)((double) player1Win / player1Total * 100) : 0;
     int player2Rate = player2Total > 0 ? (int)((double) player2Win / player2Total * 100) : 0;
 %>
-<script>
-    const contextPath = "${pageContext.request.contextPath}";
-</script>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -133,14 +130,14 @@
                     <div class="profile-image"></div>
                     <div class="profile-player-name"></div>
                 </div>
-                <img src="<%= request.getContextPath() %>/img/black_stone.png" class="stone-image-black" alt="흑돌"/>
+                <img src="${pageContext.request.contextPath}/img/black_stone.png" class="stone-image-black" alt="흑돌"/>
             </div>
 
             <div class="vs-text">vs</div>
 
             <div class="profile-player">
                 <div class="card-bg"></div>
-                <img src="<%= request.getContextPath() %>/img/white_stone.png" class="stone-image-white" alt="백돌"/>
+                <img src="${pageContext.request.contextPath}/img/white_stone.png" class="stone-image-white" alt="백돌"/>
                 <div class="profile-player-card">
                     <!-- profile-image2: 배경 이미지로 처리 -->
                     <div class="profile-image"></div>
