@@ -59,9 +59,7 @@
     int player1Rate = player1Total > 0 ? (int)((double) player1Win / player1Total * 100) : 0;
     int player2Rate = player2Total > 0 ? (int)((double) player2Win / player2Total * 100) : 0;
 %>
-<script>
-    const contextPath = "${pageContext.request.contextPath}";
-</script>
+
 
 <!DOCTYPE html>
 <html lang="en">
