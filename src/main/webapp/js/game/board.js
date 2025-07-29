@@ -73,9 +73,6 @@ export function drawStone(row, col, color) {
     stone.style.left = `${left}px`;
     stone.style.top = `${top}px`;
 
-    const stoneSound = new Audio("../../../music/stonesound.mp3");
-    stoneSound.play();
-
     boardElement.appendChild(stone);
 }
 
@@ -120,10 +117,6 @@ export function loadBoardFromSession() {
 export function initBoardEvents(sendStone, currentTurn, myRole) {
     calculateGridMetrics();
 
-    boardElement.addEventListener('beforeunload', (e) => {
-        sessionStorage.clear();
-    });
-
     window.addEventListener('resize', () => {
         calculateGridMetrics();
         redrawStones();
@@ -152,7 +145,7 @@ export function initBoardEvents(sendStone, currentTurn, myRole) {
         if (cell) sendStone(cell.row, cell.col);
     });
 
-    window.addEventListener('reload', () => {
+    window.addEventListener("DOMContentLoaded", () => {
         calculateGridMetrics();
 
         const savedBoard = sessionStorage.getItem('board');

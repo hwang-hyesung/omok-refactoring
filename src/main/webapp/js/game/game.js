@@ -32,6 +32,10 @@ export function startGame(gameId) {
         } else if(type === types[1]) {
             //STONE
             board.board[data.row][data.col] = data.stone;
+            if(data.stone === myRole){
+                const stoneSound = new Audio("../../../music/stonesound.mp3");
+                stoneSound.play();
+            }
             board.drawStone(data.row, data.col, data.stone);
             setCurrentTurn(getCurrentTurn()===1?2:1);
             board.saveBoardToSession(getCurrentTurn());
@@ -45,6 +49,7 @@ export function startGame(gameId) {
             alert(data.message);
         }
     };
+    board.loadBoardFromSession();
 
 }
 
