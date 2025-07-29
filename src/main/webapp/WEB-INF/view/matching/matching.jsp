@@ -1,8 +1,8 @@
+<link rel="stylesheet" type="text/css" href="../../../css/matching/matching.css"/>
 <div id="modalOverlay" class="modal-overlay" style="display:none;">
     <!-- 모달 박스 -->
     <div class="modal-content">
         <div class="match-image"></div>
-
         <div class="info-content">
             <!-- Player 1 -->
             <div class="player">

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>결과 모달</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/result/result.css"/>
 </head>
 <body>
 <div id="result-modal">
