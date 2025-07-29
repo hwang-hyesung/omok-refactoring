@@ -224,7 +224,7 @@ function showGameProfile(player, role) {
         nameElements[role - 1].textContent = "Load..";
     } else {
         nameElements[role - 1].textContent = player.id;
-        imgElements[role - 1].style.backgroundImage = `url('${contextPath}/img/profile/${player.img}.png')`;
+        imgElements[role - 1].style.backgroundImage = `url('/img/profile/${player.img}.png')`;
     }
 }
 

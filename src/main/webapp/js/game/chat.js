@@ -101,7 +101,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // 버튼 이벤트만 바인딩
     btn.addEventListener('click', () => sendMsg(sockets.chat, input, user));
-    input.addEventListener('keydown', e => {
+    input.addEventListener('keypress', e => {
         if (e.key === 'Enter') sendMsg(sockets.chat, input, user);
     });
 });

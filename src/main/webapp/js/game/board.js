@@ -117,10 +117,6 @@ export function loadBoardFromSession() {
 export function initBoardEvents(sendStone, currentTurn, myRole) {
     calculateGridMetrics();
 
-    boardElement.addEventListener('beforeunload', (e) => {
-        sessionStorage.clear();
-    });
-
     window.addEventListener('resize', () => {
         calculateGridMetrics();
         redrawStones();
@@ -149,12 +145,12 @@ export function initBoardEvents(sendStone, currentTurn, myRole) {
         if (cell) sendStone(cell.row, cell.col);
     });
 
-    window.onload = () => {
+    window.addEventListener("DOMContentLoaded", () => {
         calculateGridMetrics();
 
         const savedBoard = sessionStorage.getItem('board');
         const savedTurn = sessionStorage.getItem('turn');
-
+        console.log("RELOAD");
         if (savedBoard) {
             const parsedBoard = JSON.parse(savedBoard);
             for (let r = 0; r < boardSize; r++) {
@@ -170,6 +166,6 @@ export function initBoardEvents(sendStone, currentTurn, myRole) {
         if (savedTurn) {
             setCurrentTurn(parseInt(savedTurn));
         }
-    };
+    });
 }
 

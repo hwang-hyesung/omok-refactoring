@@ -32,17 +32,24 @@ export function startGame(gameId) {
         } else if(type === types[1]) {
             //STONE
             board.board[data.row][data.col] = data.stone;
+            if(data.stone === myRole){
+                const stoneSound = new Audio("../../../music/stonesound.mp3");
+                stoneSound.play();
+            }
             board.drawStone(data.row, data.col, data.stone);
             setCurrentTurn(getCurrentTurn()===1?2:1);
             board.saveBoardToSession(getCurrentTurn());
         } else if(type === types[2]) {
             //GAMEOVER
-            openModal(data.winner===myRole ? 'win' : 'lose');
+            const res = data.winner===myRole;
+            updateResult(gameId, res);
+            openModal(res);
         } else if(type === types[3]) {
             //ERROR
             alert(data.message);
         }
     };
+    board.loadBoardFromSession();
 
 }
 
@@ -52,6 +59,28 @@ export function sendStone(row, col) {
         row, col,
         stone: myRole
     }));
+}
+
+function updateResult(gameId, res){
+    const user = JSON.parse(localStorage.getItem("loginInfo"));
+    const oppUser = JSON.parse(localStorage.getItem("oppInfo"));
+    const winnerId= res ? user.id : oppUser.id;
+    console.log("updateResult");
+    $.ajax({
+        url: '/omok/play',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            gameId,
+            winnerId
+        }),
+        success: function(response) {
+            console.log("DB 업데이트 완료", response);
+        },
+        error: function(xhr, status, error) {
+            console.error("한줄 소개 변경 실패:", error);
+        }
+    });
 }
 
 
