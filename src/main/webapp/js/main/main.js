@@ -7,7 +7,10 @@ let editing = false; //bio 수정 상태 flag
 window.addEventListener('pageshow', (event) => {
     if (event.persisted) {
         console.log('뒤로가기로 접근됨 - 리로드');
-        window.location.reload();
+
+        //게임 기록 삭제
+        //매칭 중 이었을 경우: 세션에서 gameId 찾아서 삭제
+        // window.location.reload();
     }
 });
 

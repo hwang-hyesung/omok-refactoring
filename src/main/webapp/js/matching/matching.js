@@ -154,6 +154,7 @@ function handleMatchesStatus(you, player1, player2) {
 
     setTimeout(() => {
         hideMatchingModal();
+        sessionStorage.setItem("opened", "Y");
     }, 4000);
 }
 //모달 창에서 플레이어 카드 정보 넣기
@@ -209,7 +210,7 @@ function openMatchingModal() {
 
     document.getElementById("modalOverlay").style.display = "flex";
 
-    sessionStorage.setItem("opened", "Y");
+    // sessionStorage.setItem("opened", "Y");
 }
 export function hideMatchingModal() {
     document.getElementById("modalOverlay").style.display = "none";

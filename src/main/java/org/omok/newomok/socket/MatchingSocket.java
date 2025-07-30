@@ -36,6 +36,7 @@ public class MatchingSocket {
 
     @OnOpen
     public void onOpen(Session session) throws IOException {
+        System.out.println("matching socket - open: session - " + session.getId());
         //1. 엔드포인트에서 gameId 파싱
         int gameId = Integer.parseInt(session.getRequestParameterMap().get("gameId").get(0));
 
