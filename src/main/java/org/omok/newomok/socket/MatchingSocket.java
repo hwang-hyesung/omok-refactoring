@@ -29,6 +29,9 @@ public class MatchingSocket {
     private static final Map<Integer, Set<Session>> gameRoomMap = new ConcurrentHashMap<>();
     // 세션 → gameId
     private static final Map<Session, Integer> sessionRoomMap = new ConcurrentHashMap<>();
+    
+    // 게임이 시작된 방들을 추적 (매칭 소켓이 닫혀도 게임은 계속 진행)
+    private static final Set<Integer> activeGames = new HashSet<>();
 
     private static final MatchDAO matchDAO = MatchDAO.INSTANCE;
     private static final GameDAO gameDAO = GameDAO.INSTANCE;
@@ -80,6 +83,9 @@ public class MatchingSocket {
             for (Session s : sessions) {
                 s.getBasicRemote().sendText(response.toString());
             }
+            
+            // 게임이 시작되었음을 표시
+            activeGames.add(gameId);
         }
     }
 
@@ -97,8 +103,8 @@ public class MatchingSocket {
             if (sessions != null) {
                 sessions.remove(session);
 
-                // 상대방이 남아 있다면, 그 사람에게 승리 메시지 전달
-                if (!sessions.isEmpty()) {
+                // 게임이 활성 상태가 아니고, 상대방이 남아 있다면만 게임오버 처리
+                if (!activeGames.contains(gameId) && !sessions.isEmpty()) {
                     try {
                         // 남아있는 사람에게 승리 메시지 전달
                         Session remainingSession = sessions.iterator().next();
@@ -115,6 +121,7 @@ public class MatchingSocket {
 
                 if (sessions.isEmpty()) {
                     gameRoomMap.remove(gameId);
+                    activeGames.remove(gameId);
                 }
             }
         }
