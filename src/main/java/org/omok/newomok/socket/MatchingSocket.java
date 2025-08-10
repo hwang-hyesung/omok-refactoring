@@ -15,11 +15,8 @@ import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.PathParam;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
+import java.util.concurrent.*;
 
 @Log4j2
 @ServerEndpoint(value = "/matching")
@@ -30,13 +27,19 @@ public class MatchingSocket {
     // 세션 → gameId
     private static final Map<Session, Integer> sessionRoomMap = new ConcurrentHashMap<>();
 
+    //재접속하는 유저 id
+    private static final Map<Integer, Integer> reconnectedUsers = new ConcurrentHashMap<>(); //gameId, userId
+
+    ScheduledThreadPoolExecutor scheduler = new ScheduledThreadPoolExecutor(4);
+    
+
     private static final MatchDAO matchDAO = MatchDAO.INSTANCE;
     private static final GameDAO gameDAO = GameDAO.INSTANCE;
     private static final UserDAO userDAO = UserDAO.INSTANCE;
 
     @OnOpen
     public void onOpen(Session session) throws IOException {
-        System.out.println("matching socket - open: session - " + session.getId());
+        log.info("matching socket - open: session - " + session.getId());
         //1. 엔드포인트에서 gameId 파싱
         int gameId = Integer.parseInt(session.getRequestParameterMap().get("gameId").get(0));
 
@@ -50,7 +53,7 @@ public class MatchingSocket {
 
         // 접속 인원 수 확인
         if(gameRoomMap.get(gameId).size() == 1) {
-            System.out.println("matching socket - WAITING");
+            log.info("matching socket - WAITING");
 
             // 1명: 대기 상태 메시지 전송
             JsonObject response = new JsonObject();
@@ -60,7 +63,7 @@ public class MatchingSocket {
             session.getBasicRemote().sendText(response.toString());
 
         } else {
-            System.out.println("matching socket - MATCHED");
+            log.info("matching socket - MATCHED");
 
             // 2명: 매칭 상태 메시지 전송
             JsonObject response = new JsonObject();
@@ -86,46 +89,43 @@ public class MatchingSocket {
 
     @OnMessage
     public void onMessage(String message, Session session) throws IOException {
-        //게임이 끝나면 소켓 닫기 (게임 소켓, 챗 소켓)
+        //Reconnect 처리
+        int gameId = Integer.parseInt(session.getRequestParameterMap().get("gameId").get(0));
+
+        JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
+        String type = jsonObject.get("type").getAsString();
+        int userId = jsonObject.get("userId").getAsInt();
+
+        if("RECONNECT".equals(type)) {
+            reconnectedUsers.put(gameId, userId);
+        }
     }
 
 
     @OnClose
     public void onClose(Session session) {
-        Integer gameId = sessionRoomMap.remove(session);
-        if (gameId != null) {
-            Set<Session> sessions = gameRoomMap.get(gameId);
-            if (sessions != null) {
-                sessions.remove(session);
+        int gameId = Integer.parseInt(session.getRequestParameterMap().get("gameId").get(0));
+        int currentSize = gameRoomMap.get(gameId).size();
+        if(currentSize == 1) {
+            //매칭 중 나간 경우
+            scheduler.schedule(() -> {
+//                if (!reconnectedUsers.contains(userId)) {
+//                    // 진짜 나감 처리
+//                }
+            }, 3, TimeUnit.SECONDS);
 
-                // 상대방이 남아 있다면, 그 사람에게 승리 메시지 전달
-                if (!sessions.isEmpty()) {
-                    try {
-                        // 남아있는 사람에게 승리 메시지 전달
-                        Session remainingSession = sessions.iterator().next();
-                        String winnerId = (String) remainingSession.getUserProperties().get("userId");
-
-                        JsonObject gameoverMsg = new JsonObject();
-                        gameoverMsg.addProperty("type", "gameover");
-                        gameoverMsg.addProperty("winnerId", winnerId);
-                        remainingSession.getBasicRemote().sendText(gameoverMsg.toString());
-                    } catch (IOException e) {
-                        log.error("게임 종료 메시지 전송 실패", e);
-                    }
-                }
-
-                if (sessions.isEmpty()) {
-                    gameRoomMap.remove(gameId);
-                }
+            if(!matchDAO.deleteGameById(gameId)) {
+                log.error("matching socket - CLOSED: 1명 삭제 중 오류 발생");
             }
+
         }
-        log.info("[WebSocket] 연결 종료 - gameId: {}", gameId);
+        log.info("matching socket 연결 종료 - gameId: {}", gameId);
     }
 
 
     @OnError
     public void onError(Session session, Throwable throwable) {
-        log.error("[WebSocket] 에러 발생:", throwable);
+        log.error("matching socket 에러 발생:", throwable);
     }
 
 }

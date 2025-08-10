@@ -3,6 +3,7 @@ package org.omok.newomok.repository;
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j2;
 import org.omok.newomok.domain.GameVO;
+import org.omok.newomok.domain.StatVO;
 import org.omok.newomok.util.ConnectionUtil;
 
 import java.sql.Connection;
@@ -106,5 +107,26 @@ public enum MatchDAO {
             e.printStackTrace();
         }
         return cnt; // update된 행의 수를 반환한다.
+    }
+
+    //gameId로 방 삭제 함수
+    public boolean deleteGameById(int gameId) {
+        String sql = "DELETE FROM GAME WHERE game_id = ?";
+        try {
+            @Cleanup Connection conn = ConnectionUtil.INSTANCE.getConnection();
+            @Cleanup PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, gameId);
+            int re = pstmt.executeUpdate();
+
+            if(re == 1) {
+                return true;
+            }
+
+        } catch(Exception e) {
+            log.error("erros-getRanks: {}", e.getMessage());
+            e.printStackTrace();
+        }
+
+        return false;
     }
 }

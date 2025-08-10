@@ -26,14 +26,19 @@ export function getCurrentTurn() {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-   //url에 gameId parameter 확인
-   const urlParams = new URLSearchParams(window.location.search);
-   const gameId = urlParams.get("gameId");
+    //url에 gameId parameter 확인
+    const urlParams = new URLSearchParams(window.location.search);
+    const gameId = urlParams.get("gameId");
 
-   //매칭
-   matchInit(gameId);
+    //게임 정보 세션 저장
+    sessionStorage.setItem('gameId', gameId);
+    if(!sessionStorage.getItem('MATCHED')) {
+        sessionStorage.setItem('MATCHED', 'N');
+    }
+    //매칭
+    matchInit(gameId);
 
-   //모달 상태 저장 - 모달 중복 렌더링 방지
+    //모달 상태 저장 - 모달 중복 렌더링 방지
     if (!sessionStorage.getItem("opened")) {
         sessionStorage.setItem("opened", "N");
     }
@@ -97,6 +102,7 @@ export function matchInit(gameId) {
             console.log(player2);
 
             console.log('MATCHED');
+            sessionStorage.setItem('MATCHED', 'Y');
 
             //모달창 제어
             handleMatchesStatus(user, player1, player2);
