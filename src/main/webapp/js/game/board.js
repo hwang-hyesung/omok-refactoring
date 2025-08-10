@@ -1,5 +1,6 @@
 //오목 돌 배치
 import { myRole, getCurrentTurn, setCurrentTurn } from "../matching/matching.js";
+import {startGame, restoreGame} from "./game.js";
 
 export const boardSize = 15;
 export const board = Array.from({ length: boardSize }, () => Array(boardSize).fill(0));
@@ -13,6 +14,8 @@ export const offsetY = -2;
 
 let gridStartX, gridStartY, cellSizeX, cellSizeY;
 export let hoverStone = null;
+let isInitialized = false; // 초기화 상태 플래그
+
 // 보드 크기 및 셀 크기
 export function calculateGridMetrics() {
     const rect = boardImage.getBoundingClientRect();
@@ -76,11 +79,6 @@ export function drawStone(row, col, color) {
     boardElement.appendChild(stone);
 }
 
-export function saveBoardToSession(currentTurn) {
-    sessionStorage.setItem('board', JSON.stringify(board));
-    sessionStorage.setItem('turn', currentTurn);
-}
-
 export function redrawStones() {
     // 기존 돌 제거 (hover 제외)
     document.querySelectorAll(".stone:not(.hover)").forEach(el => el.remove());
@@ -103,18 +101,13 @@ export function updateBoardData(newBoard) {
     }
 }
 
-export function loadBoardFromSession() {
-    const savedBoard = sessionStorage.getItem('board');
-    const savedTurn = sessionStorage.getItem('turn');
-
-    if (savedBoard) {
-        updateBoardData(JSON.parse(savedBoard));
-        redrawStones();
-    }
-    return savedTurn ? parseInt(savedTurn) : 1;
-}
-
 export function initBoardEvents(sendStone, currentTurn, myRole) {
+    if (isInitialized) {
+        console.log("보드 이벤트가 이미 초기화되었습니다.");
+        return;
+    }
+    
+    isInitialized = true;
     calculateGridMetrics();
 
     window.addEventListener('resize', () => {
@@ -147,25 +140,21 @@ export function initBoardEvents(sendStone, currentTurn, myRole) {
 
     window.addEventListener("DOMContentLoaded", () => {
         calculateGridMetrics();
+    });
 
-        const savedBoard = sessionStorage.getItem('board');
-        const savedTurn = sessionStorage.getItem('turn');
-        console.log("RELOAD");
-        if (savedBoard) {
-            const parsedBoard = JSON.parse(savedBoard);
-            for (let r = 0; r < boardSize; r++) {
-                for (let c = 0; c < boardSize; c++) {
-                    board[r][c] = parsedBoard[r][c];
-                    if (board[r][c] !== 0) {
-                        drawStone(r, c, board[r][c]);
-                    }
-                }
+    // 새로고침 후 자동 재접속
+    window.onload = () => {
+        // 게임 복원 시도
+        if (!restoreGame()) {
+            // 복원 실패 시 기존 로직 실행
+            const gameId = sessionStorage.getItem("gameId");
+            const role = sessionStorage.getItem("myRole");
+
+            if (gameId && role) {
+                myRole = Number(role);
+                startGame(gameId);
             }
         }
-
-        if (savedTurn) {
-            setCurrentTurn(parseInt(savedTurn));
-        }
-    });
+    };
 }
 

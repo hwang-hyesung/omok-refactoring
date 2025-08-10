@@ -27,11 +27,14 @@ public class MatchingSocket {
     // 세션 → gameId
     private static final Map<Session, Integer> sessionRoomMap = new ConcurrentHashMap<>();
 
+    // 게임이 시작된 방들을 추적 (매칭 소켓이 닫혀도 게임은 계속 진행)
+    private static final Set<Integer> activeGames = new HashSet<>();
+
     //재접속하는 유저 id
     private static final Map<Integer, Integer> reconnectedUsers = new ConcurrentHashMap<>(); //gameId, userId
 
     ScheduledThreadPoolExecutor scheduler = new ScheduledThreadPoolExecutor(4);
-    
+
 
     private static final MatchDAO matchDAO = MatchDAO.INSTANCE;
     private static final GameDAO gameDAO = GameDAO.INSTANCE;
@@ -84,6 +87,9 @@ public class MatchingSocket {
             for (Session s : sessions) {
                 s.getBasicRemote().sendText(response.toString());
             }
+
+            // 게임이 시작되었음을 표시
+            activeGames.add(gameId);
         }
     }
 
@@ -104,28 +110,40 @@ public class MatchingSocket {
 
     @OnClose
     public void onClose(Session session) {
-        int gameId = Integer.parseInt(session.getRequestParameterMap().get("gameId").get(0));
-        int currentSize = gameRoomMap.get(gameId).size();
-        if(currentSize == 1) {
-            //매칭 중 나간 경우
-            scheduler.schedule(() -> {
-//                if (!reconnectedUsers.contains(userId)) {
-//                    // 진짜 나감 처리
-//                }
-            }, 3, TimeUnit.SECONDS);
+        Integer gameId = sessionRoomMap.remove(session);
+        if (gameId != null) {
+            Set<Session> sessions = gameRoomMap.get(gameId);
+            if (sessions != null) {
+                sessions.remove(session);
 
-            if(!matchDAO.deleteGameById(gameId)) {
-                log.error("matching socket - CLOSED: 1명 삭제 중 오류 발생");
+                // 게임이 활성 상태가 아니고, 상대방이 남아 있다면만 게임오버 처리
+                if (!activeGames.contains(gameId) && !sessions.isEmpty()) {
+                    try {
+                        // 남아있는 사람에게 승리 메시지 전달
+                        Session remainingSession = sessions.iterator().next();
+                        String winnerId = (String) remainingSession.getUserProperties().get("userId");
+
+                        JsonObject gameoverMsg = new JsonObject();
+                        gameoverMsg.addProperty("type", "gameover");
+                        gameoverMsg.addProperty("winnerId", winnerId);
+                        remainingSession.getBasicRemote().sendText(gameoverMsg.toString());
+                    } catch (IOException e) {
+                        log.error("게임 종료 메시지 전송 실패", e);
+                    }
+                }
+
+                if (sessions.isEmpty()) {
+                    gameRoomMap.remove(gameId);
+                }
             }
-
         }
-        log.info("matching socket 연결 종료 - gameId: {}", gameId);
+        log.info("[WebSocket] 연결 종료 - gameId: {}", gameId);
     }
 
 
     @OnError
     public void onError(Session session, Throwable throwable) {
-        log.error("matching socket 에러 발생:", throwable);
+        log.error("[WebSocket] 에러 발생:", throwable);
     }
 
 }
