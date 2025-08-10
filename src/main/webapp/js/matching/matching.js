@@ -8,6 +8,7 @@ export const sockets = {
     chat: null,
 };
 
+let isConnected = false;
 /*
     user: id/img/win/lose/rate
     opp: id/rate/img
@@ -57,7 +58,25 @@ export function matchInit(gameId) {
     sockets.matchingSocket = new WebSocket(`ws://localhost:8080/matching?gameId=${gameId}`);
 
     //2. 소켓 연결 상태 확인
-    sockets.matchingSocket.onopen = () => console.log('websocket: 정상 연결');
+    sockets.matchingSocket.onopen = () => {
+        console.log('websocket: 정상 연결');
+
+        let userId = user['id'];
+
+        if(!isConnected) {
+            //false: 새로운 접속
+            sockets.matchingSocket.send(JSON.stringify({
+                type: "CONNECT",
+                id: userId
+            }));
+        } else {
+            //true: 재접속
+            sockets.matchingSocket.send(JSON.stringify({
+                type: "RECONNECT",
+                id: userId,
+            }));
+        }
+    }
     sockets.matchingSocket.onerror = () => console.log('websocket: 오류');
     sockets.matchingSocket.onclose = () => console.log('websocket: 닫힘');
 
