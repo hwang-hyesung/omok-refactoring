@@ -5,12 +5,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
-    <link rel="stylesheet" href="./login.css">
-    <link rel="stylesheet" href="./login-error-modal.css">
+    <link rel="stylesheet" href="../../../css/login/login.css">
+    <link rel="stylesheet" href="../../../css/login/login-error-modal.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/music/css/bgm-button-style.css">
     <script src="${pageContext.request.contextPath}/music/js/bgm-control.js"></script>
     <script src="${pageContext.request.contextPath}/music/js/sound-effect-control.js"></script>
-    <script src="./login-error-modal.js"></script>
+    <script src="../../../js/login/login-error-modal.js"></script>
 </head>
 <style>
 </style>

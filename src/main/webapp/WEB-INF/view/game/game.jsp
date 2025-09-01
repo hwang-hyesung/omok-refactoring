@@ -59,21 +59,19 @@
     int player1Rate = player1Total > 0 ? (int)((double) player1Win / player1Total * 100) : 0;
     int player2Rate = player2Total > 0 ? (int)((double) player2Win / player2Total * 100) : 0;
 %>
-<script>
-    const contextPath = "${pageContext.request.contextPath}";
-</script>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>OMOK</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/view/game/game.css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/view/game/profile/profile.css" />
+    <link rel="stylesheet" href="../../../css/game/game.css" />
+    <link rel="stylesheet" href="../../../css/game/profile.css" />
+    <link rel="stylesheet" href="../../../css/game/chat.css"/>
     <%--    <link rel="stylesheet" href="${pageContext.request.contextPath}/view/game/board/board.css"/>--%>
     <%--매칭 모달 스타일 추가--%>
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/view/modal/match/matchmodal.css"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/view/game/chat/chatwindow/chatstyle.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/matching/matching.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/result/result.css"/>
 </head>
 <body>
 
@@ -116,7 +114,7 @@
         </div>
     </div>
 </div>
-<%--매칭 모달 추가 끝--%>
+<jsp:include page="../result/result.jsp" flush="false"/>
 
 <div class="container">
     <div class="board" id="board">
@@ -129,28 +127,27 @@
                 <div class="card-bg"></div>
                 <div class="profile-player-card">
                     <!-- profile-image1: 배경 이미지로 처리 -->
-                    <div class="profile-image1" style="background-image: url('<%= request.getContextPath() %>/img/profile/<%= player1Img %>.png');"></div>
-                    <div class="profile-player-name"><%= player1Id %></div>
+                    <div class="profile-image"></div>
+                    <div class="profile-player-name"></div>
                 </div>
-                <img src="<%= request.getContextPath() %>/img/black_stone.png" class="stone-image-black" alt="흑돌"/>
+                <img src="${pageContext.request.contextPath}/img/black_stone.png" class="stone-image-black" alt="흑돌"/>
             </div>
 
             <div class="vs-text">vs</div>
 
             <div class="profile-player">
                 <div class="card-bg"></div>
-                <img src="<%= request.getContextPath() %>/img/white_stone.png" class="stone-image-white" alt="백돌"/>
+                <img src="${pageContext.request.contextPath}/img/white_stone.png" class="stone-image-white" alt="백돌"/>
                 <div class="profile-player-card">
                     <!-- profile-image2: 배경 이미지로 처리 -->
-                    <div class="game-profile-image2" style="background-image: url('<%= request.getContextPath() %>/img/profile/<%= player2Img %>.png');"></div>
-                    <div class="profile-player-name"><%= player2Id %></div>
+                    <div class="profile-image"></div>
+                    <div class="profile-player-name"></div>
                 </div>
             </div>
         </div>
 
 
         <!-- 채팅 -->
-        <%--        <div class="chat">--%>
         <div class="chat-box">
             <div class="chat-top">채팅방</div>
             <div class="chat-mid"></div>
@@ -159,11 +156,11 @@
                 <button class="send-btn">전송</button>
             </div>
         </div>
-        <%--        </div>--%>
     </div>
 </div>
 
-<script type="module" src="./board.js"></script>
+<script type="module" src="/js/game/chat.js"></script>
+<script type="module" src="/js/game/board.js"></script>
 
 <%--&lt;%&ndash;여기에 웹소켓 + 매칭 관련 스크립트 추가&ndash;%&gt;--%>
 <%--<script type="module" src="${pageContext.request.contextPath}/view/sunJ_maching/js/match/modal-ui.js"></script>--%>

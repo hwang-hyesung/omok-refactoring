@@ -1,3 +1,5 @@
+import {showLoading, hideLoading} from "./loading.js";
+
 const pencilSrc = `/img/pencil_icon.png`;
 const checkSrc = `/img/check_icon.png`;
 let editing = false; //bio 수정 상태 flag
@@ -9,44 +11,64 @@ window.addEventListener('pageshow', (event) => {
     }
 });
 
-$(window).ready(function(){
+document.addEventListener("DOMContentLoaded", function() {
     let normalImgUrl = "/img/profile/" + imageNum + ".png";
     let sadImgUrl = "/img/profile/" + imageNum + "_sad.png";
 
     /* 한줄 소개 변경 클릭 리스너*/
-    $('#edit_icon').on('click', function() {
-        updateBio(this); // 클릭한 DOM 요소를 인자로 전달
+    document.getElementById('edit_icon').addEventListener('click', function() {
+        updateBio(this);
     });
 
     /* 한줄 소개 박스 포커스 리스너*/
-    $('textarea.bio_text').on({
-        focus: function () {
+    document.querySelectorAll('textarea.bio_text').forEach(function(textarea) {
+        textarea.addEventListener('focus', function () {
             setBioBorder(editing);
-        },
-        blur: function() {
+        });
+
+        textarea.addEventListener('blur', function () {
             setBioBorder(!editing);
-        },
-        mousedown: function(e) {
-            if($(this).prop('readonly')) {
+        });
+
+        textarea.addEventListener('mousedown', function (e) {
+            if (textarea.readOnly) {
                 e.preventDefault();
             }
-        }
+        });
     });
 
     /* 로그아웃 버튼 호버 리스너*/
-    $('#logout_btn img').hover(
-        function() {
-            $('#avatar')
-                .css('background-image', 'url(' + sadImgUrl + ')');
-        },
-        function() {
-            $('#avatar')
-                .css('background-image', 'url(' + normalImgUrl + ')');
-        }
-    );
+    const logoutImg = document.querySelector('#logout_btn img');
+    const avatar = document.getElementById('avatar');
 
-    /* 시작 버튼 리스너 */
-    document.getElementById("start_btn").addEventListener('click', startGame);
+    if (logoutImg && avatar) {
+        logoutImg.addEventListener('mouseenter', function () {
+            avatar.style.backgroundImage = `url(${sadImgUrl})`;
+        });
+
+        logoutImg.addEventListener('mouseleave', function () {
+            avatar.style.backgroundImage = `url(${normalImgUrl})`;
+        });
+    }
+
+    /* 시작버튼 리스너 */
+    document.getElementById("start_btn").addEventListener('click', function(e) {
+        e.preventDefault();
+
+        showLoading();
+
+        const startBtn = this;
+        startBtn.disabled = true;
+
+        const clickSound = document.getElementById("click-sound");
+        clickSound.currentTime = 0;
+        clickSound.play();
+
+        clickSound.onended = () => {
+            startGame();
+            startBtn.disabled = false;
+        };
+    });
 
     /* 랭킹(1-10위) 업데이트 */
     setRankingList(ranks);
@@ -60,6 +82,7 @@ $(window).ready(function(){
     /* 그래프 업데이트 */
     setBar(winRate);
 });
+
 
 /* 한줄 소개 변경 함수 */
 function updateBio(buttonEl) {
@@ -190,22 +213,24 @@ function startGame() {
     // 로그인 안 되어 있을 경우 이동해야 해서 이렇게 잡아둠.
     fetch("/omok/match", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({})
+        headers: { "Content-Type": "application/json" }
     })
         .then(res => {
             if (res.redirected) {
+                //로그인이 되어있지 않은 경우 리다이렉트
                 window.location.href = res.url;
                 return;
             }
             return res.json();
         })
         .then(data => {
-            if (!data) return; // 위에서 리다이렉트 되었으면 중단됨
-            //로그 찍기 용
-            console.log("서버 응답:", data); // 🔍 응답 구조 확인용
+            if (!data) return;
+            //game 정보 반환
             const gameId = data.game.gameId;
             //로케이션 경로 변경
             location.href = `/omok/play?gameId=${gameId}`;
+        })
+        .finally(data => {
+            hideLoading();
         });
 }

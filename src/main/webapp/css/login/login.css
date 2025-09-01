@@ -18,7 +18,7 @@ html, body {
 body {
     position: relative;
     min-height: 100vh;
-    background-image: url("../../../img/background1.png");
+    background-image: url("../../img/background1.png");
     background-size: cover;
     overflow: hidden;
     background-repeat: no-repeat;

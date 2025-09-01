@@ -29,81 +29,50 @@ public class MatchController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        BufferedReader reader = req.getReader();
-        String jsonBody = reader.lines().collect(Collectors.joining());
-        //다음과 같이 JSON으로 파싱해준다.
-        JsonObject json = JsonParser.parseString(jsonBody).getAsJsonObject();
-
         HttpSession session = req.getSession();
         //세션에서 userId를 가져온다.
         UserVO user = (UserVO) session.getAttribute("loginInfo");
 
-        //gameId를 갖고 있을 경우에 json 메세지를 보내도록 한다.
-        if(!json.has("gameId")){
-            //user2가 비어 있는 방이 있는지를 먼저 찾는다.
-            int gameId = matchDAO.findWaitingRoom();
+        //2. 게임 룸 확인
+        int gameId = matchDAO.findWaitingRoom();
 
-            if(gameId == -1){ //방이 없다.
-                //새로운 방을 생성한다.
-                GameVO game = new GameVO();
-                game.setPlayer1(user.getUserId());
-                game.setStatus(GameVO.GameStatus.WAITING);
+        if(gameId == -1) {
+            //2-1. 입장 가능한 룸이 없는 경우: 새로운 룸 생성
+            GameVO game = new GameVO();
+            game.setPlayer1(user.getUserId());
+            game.setStatus(GameVO.GameStatus.WAITING);
 
-                //새로운 방을 생성한다.
-                GameVO newGame = MatchDAO.makeGame(game);
+            GameVO newGame = MatchDAO.makeGame(game); //생성한 룸의 정보
 
-                JsonObject gameJson = JsonBuilderUtil.getGameInfo(newGame);
-                JsonObject youJson = JsonBuilderUtil.getUserInfo(user);
+            JsonObject gameJson = JsonBuilderUtil.getGameInfo(newGame);
 
-                sendJsonResponse(resp, gameJson, youJson, null);
-            } else { //방이 있다면
-                //해당 방에 user2로 추가한다.
-                GameVO newGame = matchDAO.getGameById(gameId);
-                newGame.setPlayer2(user.getUserId());
-                newGame.setStatus(GameVO.GameStatus.PLAYING);
-
-                //방 정보 업데이트 하기
-                matchDAO.updateGame(newGame);
-
-                JsonObject gameJson = JsonBuilderUtil.getGameInfo(newGame);
-                JsonObject youJson = JsonBuilderUtil.getUserInfo(user);
-                //상대방 정보 아이디로 가져오기
-                //지금 들어온 사람은 player2이므로 player1의 정보를 가져온다.
-                JsonObject opponentJson = JsonBuilderUtil.getUserInfo(userDAO.getUserById(newGame.getPlayer1()));
-                sendJsonResponse(resp, gameJson, youJson, opponentJson);
-            }
-        }else{
-            int gameId = json.get("gameId").getAsInt();
+            //정보 발송
+            sendMatchingResponse(resp, gameJson);
+        } else {
+            //2-2. 입장 가능한 룸이 있는 경우: 룸에 추가 후 매칭 상태로 업데이트
             GameVO game = matchDAO.getGameById(gameId);
+            game.setPlayer2(user.getUserId());
+            game.setStatus(GameVO.GameStatus.PLAYING);
+
+            matchDAO.updateGame(game);
 
             JsonObject gameJson = JsonBuilderUtil.getGameInfo(game);
-            JsonObject youJson = JsonBuilderUtil.getUserInfo(user);
 
-            JsonObject opponentJson = null;
-            if (game.getPlayer1() != null && !game.getPlayer1().equals(user.getUserId())) {
-                opponentJson = JsonBuilderUtil.getUserInfo(userDAO.getUserById(game.getPlayer1()));
-            } else if (game.getPlayer2() != null && !game.getPlayer2().equals(user.getUserId())) {
-                opponentJson = JsonBuilderUtil.getUserInfo(userDAO.getUserById(game.getPlayer2()));
-            }
-
-            sendJsonResponse(resp, gameJson, youJson, opponentJson);
+            //정보 발송
+            sendMatchingResponse(resp, gameJson);
         }
     }
 
-    private void sendJsonResponse(HttpServletResponse resp, JsonObject gameJson, JsonObject youJson, JsonObject opponentJson) throws IOException {
+    private void sendMatchingResponse(HttpServletResponse resp, JsonObject gameJson) throws IOException {
         JsonObject responseJson = new JsonObject();
         responseJson.add("game", gameJson);
-        responseJson.add("you", youJson);
-
-        //상대방까지 있을 경우 더한다.
-        if(opponentJson != null) {
-            responseJson.add("opponent", opponentJson);
-        }
 
         Gson gson = new Gson();
         resp.setContentType("application/json; charset=UTF-8");
-        PrintWriter out = resp.getWriter();
-        out.print(gson.toJson(responseJson));
-        out.flush();
+
+        try (PrintWriter out = resp.getWriter()) {
+            out.print(gson.toJson(responseJson));
+            out.flush();
+        }
     }
 }

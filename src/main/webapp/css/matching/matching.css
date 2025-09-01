@@ -107,7 +107,7 @@ body, html {
     /*width: 90vw;*/
     width: clamp(600px, 80%, 700px);
     height: auto;
-    background: url('../../../img/modal_background.png') no-repeat center center;
+    background: url('../../img/modal_background.png') no-repeat center center;
     background-size: contain;
     padding: 4vh 4vw;
     text-align: center;
@@ -123,7 +123,7 @@ body, html {
 .match-image {
     width: 80%;
     height: 25%;
-    background: url('../../../img/match_text.png') no-repeat center center;
+    background: url('../../img/match_text.png') no-repeat center center;
     background-size: contain;
     margin-top: 4vh;
     aspect-ratio: 6 / 1;
@@ -222,11 +222,11 @@ body, html {
 }
 
 .profile-image1 {
-    background-image: url('../../../img/profile/1.png');
+    background-image: url('../../img/profile/1.png');
 }
 
 .profile-image2 {
-    background-image: url('../../../img/profile/4.png');
+    background-image: url('../../img/profile/4.png');
 }
 
 .player-name {

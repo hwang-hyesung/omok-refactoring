@@ -16,14 +16,24 @@
 <head>
     <meta charset="UTF-8">
     <title>home</title>
-    <link rel="stylesheet" href="./main.css" type="text/css">
+    <link rel="stylesheet" href="../../../css/main/main.css" type="text/css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/music/css/bgm-button-style.css" type="text/css"/>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="${pageContext.request.contextPath}/view/home/home_script.js" type="text/javascript"></script>
+    <script type="module" src="../../../js/main/main.js" type="text/javascript"></script>
     <script src="${pageContext.request.contextPath}/music/js/bgm-control.js"></script>
     <script src="${pageContext.request.contextPath}/music/js/sound-effect-control.js"></script>
-    <script src = "${pageContext.request.contextPath}/view/home/click-start-button.js"></script>
 </head>
+<script>
+    const user = {
+        id: '${sessionScope.loginInfo.userId}',
+        img: '${sessionScope.loginInfo.image}',
+        win: '${sessionScope.loginInfo.win}',
+        lose: '${sessionScope.loginInfo.lose}',
+        rate: '${sessionScope.loginInfo.rate}'
+    };
+
+    localStorage.setItem("loginInfo", JSON.stringify(user));
+</script>
 <body>
 <button id="music-btn" class="music-off"></button>
 <audio id="bgm" src="${pageContext.request.contextPath}/music/bgm.mp3" loop></audio>
@@ -31,14 +41,15 @@
 <div id="logout_btn">
     <form id="logoutForm" action="/logout" method="POST">
         <button type="submit" style="background:none; border:none; padding:0; cursor:pointer;">
-            <img src="../../img/logout_icon.png" alt="로그아웃" />
+            <img src="../../../img/logout_icon.png" alt="로그아웃" />
         </button>
     </form>
 </div>
+<%@ include file="loading.jsp"%>
 <div id="full_box">
     <div id="section1">
         <!-- 랭킹 -->
-        <img src="../../img/rank_background.png" id="rank_background" alt="랭킹박스">
+        <img src="${pageContext.request.contextPath}/img/rank_background.png" id="rank_background" alt="랭킹박스">
         <div id="ranking">
             <div id="ranking_section">
             </div>
@@ -50,7 +61,7 @@
         <div id="logo_section">
             <div class="logo_wrapper">
                 <!-- 로고 -->
-                <img src="../../img/logo.png" id="logo" alt="로고">
+                <img src="${pageContext.request.contextPath}/img/logo.png" id="logo" alt="로고">
             </div>
         </div>
         <div id="profile_section">
@@ -65,7 +76,7 @@
                         <span class="label">한줄소개</span>
                         <span class="value bio">
                                 <textarea class="bio_text" maxlength="20" readonly></textarea>
-                                <img src="../../img/pencil_icon.png" id="edit_icon" alt="수정 아이콘">
+                                <img src="${pageContext.request.contextPath}/img/pencil_icon.png" id="edit_icon" alt="수정 아이콘">
                             </span>
                     </div>
                     <div class="info_row">
@@ -95,7 +106,7 @@
             </div>
         </div>
         <div id="button_section">
-            <button id="start_btn" class="img-button click-sound"></button>
+            <button id="start_btn" class="img-button sound-button"></button>
         </div>
     </div>
 </div>

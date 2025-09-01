@@ -23,8 +23,10 @@ public enum GameDAO {
             pstmt.setString(1, GameVO.GameStatus.FINISHED.name());
             pstmt.setString(2, finishedGame.getWinnerId());
             pstmt.setInt(3, finishedGame.getGameId());
+            System.out.println("업데이트 시도: " + finishedGame.getGameId() + finishedGame.getWinnerId());
+            System.out.println("winnerId = " + finishedGame.getWinnerId());
 
-            cnt = pstmt.executeUpdate(); // update된 행의 수를 반환받는다.
+            cnt = pstmt.executeUpdate();// update된 행의 수를 반환받는다.
         } catch (Exception e) {
             log.error("finishGame 에러 발생 : {}", e.getMessage());
             e.printStackTrace();

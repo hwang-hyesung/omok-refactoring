@@ -50,7 +50,7 @@ public class GameController extends HttpServlet {
         log.info("gameId : {}",gameId);
         log.info("winnerId : {}",winnerId);
 
-        GameVO gameVO = matchDAO.getGameById(gameId);
+        GameVO gameVO = MatchDAO.getGameById(gameId);
         gameVO.setWinnerId(winnerId);
 
         HttpSession session = req.getSession();
@@ -61,11 +61,11 @@ public class GameController extends HttpServlet {
         GameVO finishedGame = GameVO.builder()
                 .gameId(gameId)
                 .status(GameVO.GameStatus.FINISHED)
-                .winnerId(winnerId)
-                .build();
+                .winnerId(winnerId).build();
 
         int updatedCount = gameDAO.finishGame(finishedGame);
         log.info("updatedCount : {}",updatedCount);
+        System.out.println("updatedCount : " + updatedCount);
 
         JsonObject responseJson = new JsonObject();
         if (updatedCount > 0) {

@@ -80,7 +80,7 @@ start btn 움직임
 }
 
 body {
-    background-image: url("../../../img/background2.png");
+    background-image: url("../../img/background2.png");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: top center;
@@ -167,7 +167,7 @@ body {
     height: 8.5vh;
     width: 29.5vw;
     overflow: hidden;
-    border-radius: 1.5vw;
+    border-radius: 0.5vw;
     margin-top: 0;
     margin-bottom: 0.5vw;
     flex-shrink: 0;
@@ -264,8 +264,8 @@ body {
     height: 4rem;
      */
     height: 8.5vh;
-    width: 98.5%;
-    border-radius: 1.5vw;
+    width: 96.5%;
+    border-radius: 0.5vw;
     margin-top: 1vh;
     margin-bottom: 0;
     background-color: #9EFFF4;
@@ -311,8 +311,8 @@ body {
     width: 75%;
     background-color: rgba(200, 238, 13, 0.6);
     border-radius: 3vw;
-    border: 0.5vw solid #207600;
-    box-shadow: 1.2vw 1.2vw 1.5vw 0.3vw rgba(0,0,0,0.3);
+    border: 0.4vw solid #207600;
+    box-shadow: 0.2vw 0.2vw 0.4vw 0.2vw rgba(0,0,0,0.2);
     display: flex;
 }
 
@@ -345,8 +345,8 @@ body {
 .value {
     background-color: white;
     padding: 1vh 1vw;
-    border-radius: 0.5vw;
-    box-shadow: 0.2vw 0.2vw 0.4vw #aaa;
+    border-radius: 0.4vw;
+    box-shadow: 0.1vw 0.1vw 0.2vw #aaa;
     font-size: 1vw;
     line-height: 3vh;
     word-break: break-word;
@@ -404,7 +404,7 @@ textarea.bio_text {
     height: 3.2vh;
     border-radius: 3vw;
     overflow: hidden;
-    box-shadow: 0.2vw 0.2vw 0.5vw rgba(0,0,0,0.2);
+    box-shadow: 0.1vw 0.1vw 0.2vw #aaa;
     margin: 1vh 0;
     font-size: 0.9vw;
     color: white;
@@ -470,7 +470,7 @@ textarea.bio_text {
     width: 80%;
     aspect-ratio: 1 / 1;
     border-radius: 2vw;
-    background-image: url("../../../img/profile/2.png");
+    background-image: url("../../img/profile/2.png");
     background-color: skyblue;
     background-size: cover;
     background-position: center;
@@ -513,7 +513,7 @@ textarea.bio_text {
     aspect-ratio: 1.9 / 1;
     border: none;
     background-color: transparent;
-    background-image: url("../../../img/start_btn.png");
+    background-image: url("../../img/start_btn.png");
     background-repeat: no-repeat;
     background-size: contain;
     animation: jittery 4s infinite;
