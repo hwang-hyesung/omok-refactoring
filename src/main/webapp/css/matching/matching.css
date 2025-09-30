@@ -270,14 +270,35 @@ body, html {
 }
 
 .vs-text {
-    flex: 0 0 auto; /* 너비 고정 */
+    flex: 0 0 auto;
     align-self: center;
     font-size: clamp(48px, 4vw, 70px);
     font-weight: bold;
-    color: black;
+    color: #FFD700;
     min-width: 60px;
     text-align: center;
+    text-shadow:
+            4px 4px 0px #000,
+            -2px -2px 0px #000,
+            2px -2px 0px #000,
+            -2px 2px 0px #000,
+            2px 2px 0px #000;
+    animation: pixel-shake 1s ease-in-out infinite;
 }
+
+@keyframes pixel-shake {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-2px, 2px); }
+    20% { transform: translate(2px, -2px); }
+    30% { transform: translate(-2px, -2px); }
+    40% { transform: translate(2px, 2px); }
+    50% { transform: translate(-2px, 2px); }
+    60% { transform: translate(2px, -2px); }
+    70% { transform: translate(-2px, -2px); }
+    80% { transform: translate(2px, 2px); }
+    90% { transform: translate(-2px, 2px); }
+}
+
 
 .loading-icon {
     display: block;

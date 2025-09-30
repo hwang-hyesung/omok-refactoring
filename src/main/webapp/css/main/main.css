@@ -19,63 +19,77 @@
 }
 
 /*
-로고 움직임
+픽셀 아트 전역 스타일
+ */
+* {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+/*
+로고 움직임 - 픽셀 아트 스타일로 강화
  */
 @-webkit-keyframes logo-move {
+    0%, 100% {
+        -webkit-transform: rotate(0deg) translateY(0);
+    }
+    25% {
+        -webkit-transform: rotate(-2deg) translateY(-5px);
+    }
+    75% {
+        -webkit-transform: rotate(2deg) translateY(-5px);
+    }
+}
+
+@keyframes pixel-float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
     50% {
-        -webkit-transform: rotate(-1.5deg);
+        transform: translateY(-8px);
     }
 }
 
 /*
-start btn 움직임
+start btn 움직임 - 더 강렬한 픽셀 애니메이션
  */
 @keyframes jittery {
-    5%,
-    50% {
-        transform: scale(1);
+    0%, 100% {
+        transform: scale(1) rotate(0deg);
     }
-
     10% {
-        transform: scale(0.9);
+        transform: scale(0.95) rotate(-2deg);
     }
-
-    15% {
-        transform: scale(1.15);
-    }
-
     20% {
-        transform: scale(1.15) rotate(-5deg);
+        transform: scale(1.1) rotate(2deg);
     }
-
-    25% {
-        transform: scale(1.15) rotate(5deg);
-    }
-
     30% {
-        transform: scale(1.15) rotate(-3deg);
+        transform: scale(1.05) rotate(-1deg);
     }
-
-    35% {
-        transform: scale(1.15) rotate(2deg);
-    }
-
     40% {
-        transform: scale(1.15) rotate(0);
+        transform: scale(1.15) rotate(1deg);
+    }
+    50% {
+        transform: scale(1) rotate(0deg);
     }
 }
 
-@keyframes jelly {
-    25% {
-        transform: scale(0.9, 1.1);
+@keyframes pixel-pulse {
+    0%, 100% {
+        filter: brightness(1) drop-shadow(0 0 5px rgba(255, 255, 0, 0.5));
     }
-
     50% {
-        transform: scale(1.1, 0.9);
+        filter: brightness(1.2) drop-shadow(0 0 15px rgba(255, 255, 0, 0.8));
     }
+}
 
-    75% {
-        transform: scale(0.95, 1.05);
+@keyframes scanline {
+    0% {
+        transform: translateY(-100%);
+    }
+    100% {
+        transform: translateY(100vh);
     }
 }
 
@@ -85,6 +99,42 @@ body {
     background-repeat: no-repeat;
     background-position: top center;
     margin: 0;
+    position: relative;
+}
+
+/* CRT 스캔라인 효과 */
+/*body::before {*/
+/*    content: '';*/
+/*    position: fixed;*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*    width: 100%;*/
+/*    height: 100%;*/
+/*    background: repeating-linear-gradient(*/
+/*            0deg,*/
+/*            rgba(0, 0, 0, 0.15) 0px,*/
+/*            transparent 1px,*/
+/*            transparent 2px,*/
+/*            rgba(0, 0, 0, 0.15) 3px*/
+/*    );*/
+/*    pointer-events: none;*/
+/*    z-index: 9999;*/
+/*    animation: scanline 8s linear infinite;*/
+/*}*/
+
+/* 픽셀 그리드 오버레이 */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+            repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px),
+            repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px);
+    pointer-events: none;
+    z-index: 9998;
 }
 
 #logout_btn {
@@ -97,6 +147,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    filter: drop-shadow(3px 3px 0px rgba(0, 0, 0, 0.5));
+    transition: transform 0.1s;
+}
+
+#logout_btn:hover {
+    filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.7));
 }
 
 #logout_btn img {
@@ -106,7 +162,7 @@ body {
 }
 
 #full_box {
-    display:flex;
+    display: flex;
     justify-content: center;
     height: 100vh;
 }
@@ -117,14 +173,15 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    animation: pixel-float 3s ease-in-out infinite;
 }
 
 #rank_background {
-    height:100%;
+    height: 100%;
     width: 100%;
     display: block;
+    filter: drop-shadow(8px 8px 0px rgba(0, 0, 0, 0.4));
 }
-
 
 #ranking {
     position: absolute;
@@ -144,49 +201,60 @@ body {
     width: 100%;
     overflow-y: auto;
 }
+
 #ranking_section::-webkit-scrollbar {
-    width: 0.5vw;
+    width: 0.8vw;
+    background: #2C1810;
+    border: 0.2rem solid #000;
 }
 
 #ranking_section::-webkit-scrollbar-thumb {
-    background-color: #B97843;
-    border-radius: 0.5vw;
-    -webkit-box-shadow: inset 0 0 0.3vw rgba(0,0,0,.3);
+    background: linear-gradient(180deg, #FF9A56 0%, #D87A3C 50%, #B86434 100%);
+    border: 0.2rem solid #000;
+    box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.3),
+    inset -2px -2px 0px rgba(0, 0, 0, 0.3);
 }
 
 #ranking_section::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255,.3);
-    border-radius: 1vw;
+    background: #4A3228;
+    border: 0.2rem solid #000;
+    box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .rank_item {
     position: relative;
-    /*
-    height: 4rem;
-     */
     height: 8.5vh;
     width: 29.5vw;
     overflow: hidden;
-    border-radius: 0.5vw;
     margin-top: 0;
     margin-bottom: 0.5vw;
     flex-shrink: 0;
+    border: 0.2rem solid #000;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.5);
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.rank_item:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.5);
 }
 
 .rank_item_background {
     width: 100%;
     height: 100%;
-    background-color: #FFC77E;
-    box-shadow: inset 0 0 2vw rgba(255, 255, 255, 0.5),
-    0 0 1.5vw rgba(0, 0, 0, 0.8);
+    background: linear-gradient(180deg, #FFB866 0%, #FFA040 100%);
+    box-shadow: inset 3px 3px 0px rgba(255, 255, 255, 0.4),
+    inset -3px -3px 0px rgba(0, 0, 0, 0.3);
     display: flex;
     justify-content: space-around;
     align-items: center;
 }
 
 .rank_item_background.highlight {
-    background-color: #9EFFF4;
-    box-shadow: inset 0 0 2vw rgba(75, 151, 149, 0.5);
+    background: linear-gradient(180deg, #7FFFF4 0%, #4DFFE9 100%);
+    box-shadow: inset 3px 3px 0px rgba(255, 255, 255, 0.5),
+    inset -3px -3px 0px rgba(0, 100, 100, 0.3);
+    animation: pixel-pulse 2s ease-in-out infinite;
 }
 
 .rank_num {
@@ -196,6 +264,13 @@ body {
     align-items: center;
     font-family: 'yg-jalnan';
     font-size: 2vw;
+    color: #FFF;
+    text-shadow:
+            3px 3px 0px #000,
+            -1px -1px 0px #000,
+            1px -1px 0px #000,
+            -1px 1px 0px #000,
+            1px 1px 0px #000;
 }
 
 .rank_user_image_wrapper {
@@ -209,11 +284,12 @@ body {
 .rank_user_image {
     width: 100%;
     height: 100%;
-    border-radius: 50%;
-    border: 0.3vw solid white;
+    border-radius: 0;
+    border: 0.2rem solid #000;
+    box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.5),
+    inset 2px 2px 0px rgba(255, 255, 255, 0.3);
     object-fit: cover;
 }
-
 
 .rank_user_id {
     width: 40%;
@@ -223,6 +299,12 @@ body {
     align-items: center;
     font-family: 'yg-jalnan';
     font-size: 1.8vw;
+    color: #FFF;
+    text-shadow:
+            2px 2px 0px #000,
+            -1px -1px 0px #000,
+            1px -1px 0px #000,
+            -1px 1px 0px #000;
 }
 
 .rank_user_rate {
@@ -235,11 +317,11 @@ body {
     align-items: center;
     font-family: 'yg-jalnan';
     font-size: 1.6vw;
-    background-color: rgba(224, 158, 110, 0.3);
-    border-radius: 999px;
+    background: linear-gradient(180deg, #E89B6D 0%, #D67C4A 100%);
+    border: 0.2rem solid #000;
     overflow: hidden;
-    box-shadow: inset 0 0 2vw rgba(255, 255, 255, 0.4),
-    0 0 1vw rgba(0, 0, 0, 0.2);
+    box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.5),
+    inset 2px 2px 0px rgba(255, 255, 255, 0.3);
 }
 
 .win_icon {
@@ -248,35 +330,36 @@ body {
     object-fit: contain;
     display: inline-block;
     margin-right: 0.5vw;
+    filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.5));
 }
 
 .win_rate {
     color: white;
     text-shadow:
-            -0.07vw -0.07vw 0 black,
-            0.07vw -0.07vw 0 black,
-            -0.07vw  0.07vw 0 black,
-            0.07vw  0.07vw 0 black;
+            2px 2px 0px black,
+            -1px -1px 0px black,
+            1px -1px 0px black,
+            -1px 1px 0px black,
+            1px 1px 0px black;
 }
 
 #my_rank {
-    /*
-    height: 4rem;
-     */
     height: 8.5vh;
     width: 96.5%;
-    border-radius: 0.5vw;
     margin-top: 1vh;
     margin-bottom: 0;
-    background-color: #9EFFF4;
-    box-shadow: inset 0 0 2vw rgba(75, 151, 149, 0.5);
+    background: linear-gradient(180deg, #7FFFF4 0%, #4DFFE9 100%);
+    border: 0.2rem solid #000;
+    box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.5),
+    inset 3px 3px 0px rgba(255, 255, 255, 0.5);
     display: flex;
     justify-content: space-around;
     align-items: center;
+    animation: pixel-pulse 2s ease-in-out infinite;
 }
 
 #section2 {
-    flex: 0 0 55%; /* 너비 55% 고정 */
+    flex: 0 0 55%;
     display: flex;
     flex-direction: column;
 }
@@ -290,12 +373,13 @@ body {
 
 .logo_wrapper {
     height: 100%;
+    animation: logo-move 3s ease-in-out infinite;
 }
 
-
-
 #logo {
+    padding-top: 1rem;
     height: 85%;
+    filter: drop-shadow(6px 6px 0px rgba(0, 0, 0, 0.5));
 }
 
 #profile_section {
@@ -308,11 +392,12 @@ body {
 
 #profile_card {
     height: 92%;
-    width: 75%;
-    background-color: rgba(200, 238, 13, 0.6);
-    border-radius: 3vw;
-    border: 0.4vw solid #207600;
-    box-shadow: 0.2vw 0.2vw 0.4vw 0.2vw rgba(0,0,0,0.2);
+    width: 80%;
+    background: linear-gradient(180deg, #D4F52B 0%, #C8EE0D 50%, #B8DE00 100%);
+    border: 0.2rem solid #207600;
+    box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.4),
+    inset 4px 4px 0px rgba(255, 255, 255, 0.3),
+    inset -4px -4px 0px rgba(0, 100, 0, 0.2);
     display: flex;
 }
 
@@ -338,15 +423,17 @@ body {
 .label {
     font-weight: bold;
     margin-bottom: 0.3vh;
-    color: black;
+    color: #000;
     font-size: 1.2vw;
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);
 }
 
 .value {
-    background-color: white;
+    background: linear-gradient(180deg, #FFFFFF 0%, #F0F0F0 100%);
     padding: 1vh 1vw;
-    border-radius: 0.4vw;
-    box-shadow: 0.1vw 0.1vw 0.2vw #aaa;
+    border: 0.2rem solid #000;
+    box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3),
+    inset 2px 2px 0px rgba(255, 255, 255, 0.5);
     font-size: 1vw;
     line-height: 3vh;
     word-break: break-word;
@@ -361,7 +448,6 @@ body {
     justify-content: space-between;
     height: 9.2vh;
 }
-
 
 textarea.bio_text {
     width: 95%;
@@ -387,6 +473,13 @@ textarea.bio_text {
     margin-left: 0.8vw;
     vertical-align: middle;
     cursor: pointer;
+    filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.3));
+    transition: transform 0.1s;
+}
+
+#edit_icon:hover {
+    transform: scale(1.2);
+    filter: drop-shadow(3px 3px 0px rgba(0, 0, 0, 0.5));
 }
 
 #winning_box {
@@ -402,14 +495,13 @@ textarea.bio_text {
 .multi-graph {
     display: flex;
     height: 3.2vh;
-    border-radius: 3vw;
     overflow: hidden;
-    box-shadow: 0.1vw 0.1vw 0.2vw #aaa;
     margin: 1vh 0;
     font-size: 0.9vw;
     color: white;
-    text-shadow: 0.1vw 0.1vw 0.2vw black;
-    border: 0.2vw solid black;
+    text-shadow: 2px 2px 0px black;
+    border: 0.2rem solid #000;
+    box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
 }
 
 .bar {
@@ -417,14 +509,26 @@ textarea.bio_text {
     align-items: center;
     justify-content: center;
     height: 100%;
+    position: relative;
+}
+
+.bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, transparent 100%);
+    pointer-events: none;
 }
 
 .win {
-    background-color: #4a68c3;
+    background: linear-gradient(180deg, #5A7FE6 0%, #4A68C3 50%, #3A58B3 100%);
 }
 
 .lose {
-    background-color: #F44336;
+    background: linear-gradient(180deg, #FF5A4D 0%, #F44336 50%, #E43326 100%);
 }
 
 .legend {
@@ -443,20 +547,19 @@ textarea.bio_text {
     align-items: center;
     gap: 0.4vw;
     color: black;
-    border-radius: 50%;
-    border: 0.2vw solid black;
+    border: 0.2rem solid black;
     aspect-ratio: 1 / 1;
     margin-right: 0.2vw;
     display: inline-block;
     width: 1vw;
+    box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3),
+    inset 1px 1px 0px rgba(255, 255, 255, 0.3);
 }
 
 .exp_text {
     color: black;
-    /*
-    font-size: 0.9rem;
-     */
     font-size: 1vw;
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);
 }
 
 #profile_image_section {
@@ -469,38 +572,42 @@ textarea.bio_text {
 #avatar {
     width: 80%;
     aspect-ratio: 1 / 1;
-    border-radius: 2vw;
     background-image: url("../../img/profile/2.png");
     background-color: skyblue;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     position: relative;
+    border: 0.2rem solid #000;
+    box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.5),
+    inset 4px 4px 0px rgba(255, 255, 255, 0.3);
 }
 
 #edit_btn {
     position: absolute;
     bottom: -1vh;
     right: -1vw;
-    background-color: #FFD600;
+    background: linear-gradient(180deg, #FFED4E 0%, #FFD600 50%, #F0C800 100%);
     width: 4vw;
     height: 4vw;
-    border-radius: 50%;
+    border: 0.2rem solid #000;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0.2vw 0.2vw 0.5vw rgba(0,0,0,0.3);
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.5),
+    inset 2px 2px 0px rgba(255, 255, 255, 0.5);
     cursor: pointer;
+    transition: transform 0.1s;
+}
+
+#edit_btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.5),
+    inset 2px 2px 0px rgba(255, 255, 255, 0.5);
 }
 
 #button_section {
     height: 25%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#button_section {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -517,4 +624,17 @@ textarea.bio_text {
     background-repeat: no-repeat;
     background-size: contain;
     animation: jittery 4s infinite;
+    filter: drop-shadow(8px 8px 0px rgba(0, 0, 0, 0.5));
+    transition: transform 0.1s, filter 0.1s;
+}
+
+#start_btn:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(10px 10px 0px rgba(0, 0, 0, 0.6))
+    brightness(1.1);
+}
+
+#start_btn:active {
+    transform: scale(0.98) translate(4px, 4px);
+    filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.5));
 }

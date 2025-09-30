@@ -8,6 +8,11 @@ import {openModal} from "../result/result.js";
 
 let types = ['INIT', 'STONE', 'GAMEOVER', 'ERROR', 'STATE'];
 
+window.addEventListener("DOMContentLoaded", () => {
+    if(sessionStorage.getItem("resultModal") === 'opened') {
+        openModal(sessionStorage.getItem("resultModal"));
+    }
+});
 /* 게임 시작 시 웹소켓 오픈 */
 export function startGame(gameId) {
     // 기존 게임 소켓이 있다면 정리

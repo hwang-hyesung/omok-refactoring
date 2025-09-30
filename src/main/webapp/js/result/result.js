@@ -1,6 +1,8 @@
 
 const user = JSON.parse(localStorage.getItem("loginInfo"));
 export function openModal(res) {
+    sessionStorage.setItem("resultModal", "opened");
+    sessionStorage.setItem("result", res);
 
     const win = parseInt(user.win || 0, 10);
     const lose = parseInt(user.lose || 0, 10);

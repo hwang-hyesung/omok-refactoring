@@ -1,8 +1,10 @@
 import {showLoading, hideLoading} from "./loading.js";
+import {openModal} from "../result/result";
 
 const pencilSrc = `/img/pencil_icon.png`;
 const checkSrc = `/img/check_icon.png`;
 let editing = false; //bio 수정 상태 flag
+
 
 window.addEventListener('pageshow', (event) => {
     if (event.persisted) {
