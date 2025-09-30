@@ -1,5 +1,5 @@
 import {showLoading, hideLoading} from "./loading.js";
-import {openModal} from "../result/result";
+
 
 const pencilSrc = `/img/pencil_icon.png`;
 const checkSrc = `/img/check_icon.png`;
